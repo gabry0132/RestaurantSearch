@@ -1,0 +1,13 @@
+<resources>
+    <string name="gourmet_api_key">9907554b6fcbbf43</string>    <!-- 本番であれば企業のやり方で隠します -->
+    <string name="app_name">Restaurant Search</string>
+    <string name="main_title">レストラン検索</string>
+    <string name="credits_bottom_page">Powered by <u>ホットペッパーグルメ Webサービス</u></string> <!-- リンクであることをユーザにアンダーバーで示します -->
+    <string name="store_name_hint">お店の名前</string>
+    <string name="store_search">お店を検索</string>
+    <string name="store_search_new_params">この条件で検索</string>
+    <string name="search_results_intro">検索結果</string>
+    <string name="expand_search_params_window">検索条件を表示</string>
+    <string name="hide_search_params_window">検索条件を非表示</string>
+    <string name="recyclerViewDescription">検索結果で出てきたレストランの一覧です。</string>
+</resources>

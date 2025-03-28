@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RestaurantsListActivity">
+
+    <RelativeLayout
+        android:id="@+id/relLayoutTopMostPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/txtSearchResults"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="@string/search_results_intro"
+            android:textSize="34sp" />
+
+        <RelativeLayout
+            android:id="@+id/relLayoutCollapsedSearchParams"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="40dp"
+            android:layout_toEndOf="@+id/txtSearchResults"
+            android:onClick="revertSearchParamsMenuState"
+            android:padding="20dp"
+            android:visibility="visible">
+
+            <TextView
+                android:id="@+id/txtExpandSearchParamsIntro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/expand_search_params_window"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/imgDownArrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-7dp"
+                android:layout_toEndOf="@+id/txtExpandSearchParamsIntro"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_down_arrow" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relLayoutExpandedSearchParams"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="60dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/imgUpArrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-5dp"
+                android:layout_toEndOf="@+id/txtHideSearchParamsIntro"
+                android:importantForAccessibility="no"
+                android:onClick="revertSearchParamsMenuState"
+                android:src="@drawable/ic_up_arrow"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <TextView
+                android:id="@+id/txtHideSearchParamsIntro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="190dp"
+                android:onClick="revertSearchParamsMenuState"
+                android:text="@string/hide_search_params_window"
+                android:textSize="16sp"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <RelativeLayout
+                android:id="@+id/relLayoutSearchParamsContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtHideSearchParamsIntro">
+
+                <EditText
+                    android:id="@+id/edtTxtRestaurantName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_margin="10dp"
+                    android:ems="10"
+                    android:hint="@string/store_name_hint"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+
+                    />
+
+                <!-- layout_belowのポインターは必ず最後のedtTxtにしてください。 -->
+                <Button
+                    android:id="@+id/btnSearch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/edtTxtRestaurantName"
+                    android:layout_marginStart="160dp"
+                    android:layout_marginBottom="20dp"
+                    android:onClick="initiateSearch"
+                    android:text="@string/store_search_new_params" />
+
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/relLayoutTopMostPanel"
+        android:layout_marginTop="30dp"
+        android:contentDescription="@string/recyclerViewDescription" />
+
+    <RelativeLayout
+        android:id="@+id/relLayoutObfuscationPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.5"
+        android:background="@color/white">
+
+        <ProgressBar
+            android:id="@+id/loadingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

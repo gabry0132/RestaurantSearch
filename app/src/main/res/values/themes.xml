@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- ベースのテーマを設定する -->
+    <style name="Base.Theme.RestaurantSearch" parent="Theme.MaterialComponents.Light.NoActionBar">
+
+        <!-- アクションバー（ページの上のラベル）を非表示にします。 -->
+
+    </style>
+
+    <style name="Theme.RestaurantSearch" parent="Base.Theme.RestaurantSearch" />
+</resources>
