@@ -3,5 +3,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="beige">#F5F5DC</color>
+    <color name="light_azure">#E8FBFE</color>
+    <color name="light_sky_blue">#98D9F5</color>
+    <color name="sky_blue">#98AAF5</color>
 
 </resources>

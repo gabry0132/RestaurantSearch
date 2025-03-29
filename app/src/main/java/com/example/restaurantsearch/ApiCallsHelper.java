@@ -47,6 +47,7 @@ public class ApiCallsHelper {
             public void onResponse(JSONObject response) {
 
                 try {
+                    determineMaxPageNumber(response.getJSONObject("results").getString("results_available"));
                     JSONArray shops = response.getJSONObject("results").getJSONArray("shop");
                     fillShopsList(shops);
                 } catch (JSONException e) {
@@ -71,6 +72,14 @@ public class ApiCallsHelper {
         RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(request);
 
+    }
+
+    private void determineMaxPageNumber(String resultsAvailable) {
+        int maxPageNumber = Integer.parseInt(resultsAvailable) / RestaurantsListActivity.MAX_RESULTS_PER_PAGE;
+        if(Integer.parseInt(resultsAvailable) % RestaurantsListActivity.MAX_RESULTS_PER_PAGE != 0){
+            maxPageNumber++;
+        }
+        RestaurantsListActivity.maxPageNumber = maxPageNumber;
     }
 
     private void fillShopsList(JSONArray shops) {

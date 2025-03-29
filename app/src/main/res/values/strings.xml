@@ -9,5 +9,12 @@
     <string name="search_results_intro">検索結果</string>
     <string name="expand_search_params_window">検索条件を表示</string>
     <string name="hide_search_params_window">検索条件を非表示</string>
-    <string name="recyclerViewDescription">検索結果で出てきたレストランの一覧です。</string>
+    <string name="recycler_view_description">検索結果で出てきたレストランの一覧です。</string>
+    <string name="previous_page_description">前のページへ</string>
+    <string name="next_page_description">次のページへ</string>
+    <string name="previous_page_button_text">⋘ %d </string>
+    <string name="next_page_button_text"> %d ⋙</string>
+    <string name="current_page">%1d / %2d</string>
+    <string name="search_failed_intro">条件に該当するお店がありません</string>
+    <string name="search_failed_finetext">条件を更新してもう一度検索してみてください。</string>
 </resources>

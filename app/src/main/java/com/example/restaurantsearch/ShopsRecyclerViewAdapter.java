@@ -41,6 +41,9 @@ public class ShopsRecyclerViewAdapter extends RecyclerView.Adapter<ShopsRecycler
         //子クラスが本クラス内にありますので直接フィールドへアクセスできます。
         holder.txtShopName.setText(shops.get(position).getName());
         holder.txtGenre.setText(shops.get(position).getGenre());
+        //txtGenreがwidth="wrap-contents"であっても、空文字の場合は右のマージンが表示されるのでgenreがない時に次のtxtEstimatedPriceが右に移動してしまいますので、マージンがいらない場合は削除します。
+        if(holder.txtGenre.getText().toString().isEmpty()) removeRightMargin(holder.txtGenre);
+        //genreがある時に問題なくgenreとestimatedPriceの隙間が表示されますが、下の方へスクロールすると、戻ったら隙間がなくなったことが確認できます。onScrollでの　表示処理のコードの問題ですね。アンドロイドの問題ですので修正しようと思いません。
         holder.txtEstimatedPrice.setText(shops.get(position).getEstimatedPrice());
         holder.txtAccess.setText(shops.get(position).getAccess());
         holder.parent.setOnClickListener(new View.OnClickListener() {
@@ -59,6 +62,12 @@ public class ShopsRecyclerViewAdapter extends RecyclerView.Adapter<ShopsRecycler
                 .asBitmap()
                 .load(shops.get(position).getImageUrl())
                 .into(holder.image);
+    }
+
+    private void removeRightMargin(View view) {
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        params.setMarginEnd(0);
+        view.requestLayout();
     }
 
     @Override
