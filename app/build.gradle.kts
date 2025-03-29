@@ -47,4 +47,7 @@ dependencies {
     implementation(libs.volley)
     implementation(libs.cardview)
     implementation(libs.glide)
+    implementation(libs.play.services.location)
+    implementation(libs.work.runtime)
+    implementation(libs.concurrent.listenablefuture)
 }

@@ -1,16 +1,23 @@
 package com.example.restaurantsearch;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -39,6 +46,7 @@ public class RestaurantsListActivity extends AppCompatActivity {
     //UIのView
     private EditText edtTxtRestaurantName;
     private TextView txtPageNumber;
+    private Spinner spnLocation, spnDistance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +67,8 @@ public class RestaurantsListActivity extends AppCompatActivity {
         searchParamsExpanded = false;
         recView = findViewById(R.id.recView);
         btnSearch = findViewById(R.id.btnSearch);
+        spnLocation = findViewById(R.id.spnLocation);
+        spnDistance = findViewById(R.id.spnDistance);
         btnToNextPage = findViewById(R.id.btnNextPage);
         txtPageNumber = findViewById(R.id.txtPageNumber);
         btnToPreviousPage = findViewById(R.id.btnPreviousPage);
@@ -68,6 +78,8 @@ public class RestaurantsListActivity extends AppCompatActivity {
         //前のページからデータを取得します。
         Intent intent = getIntent();
         edtTxtRestaurantName.setText(intent.getStringExtra("restaurantName"));
+        spnLocation.setSelection(intent.getIntExtra("spnLocationIndex", 1));
+        spnDistance.setSelection(intent.getIntExtra("spnDistanceIndex", 1));
 
         //検索処理の準備と実行を行います。
         //画面内のボタンでも呼べるようにしたいので全部が自分のメソッドになります。
@@ -87,8 +99,6 @@ public class RestaurantsListActivity extends AppCompatActivity {
         } else {
             currentResultsPage = 1;
         }
-
-        //handlePageMovementButtonsVisibility();
 
 
         //TODO: input check once more. the user should be checked equally as thoroughly every time they search, and from any page
@@ -165,7 +175,7 @@ public class RestaurantsListActivity extends AppCompatActivity {
                 terminateLoadingAnimation();
 
                 //結果がなければ伝えます
-                if(shopsList.size() > 0){
+                if(!shopsList.isEmpty()){
 
                     //直前ヒットなしの検索から、成功モードに切り替えます
                     handleSuccessfulSearch();
@@ -224,20 +234,75 @@ public class RestaurantsListActivity extends AppCompatActivity {
     }
 
     private String setUrlForSearch() {
-        String url = "https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=" + apiKey;
-        if(!edtTxtRestaurantName.getText().toString().isEmpty()){
-            url += "&name_any=" + edtTxtRestaurantName.getText().toString().trim();
+
+        //lat,lng の形で求めます。
+        String coordinates = getCoordinates();
+
+        if(coordinates == null){
+            Toast.makeText(this, "座標が見つかりませんでした。", Toast.LENGTH_LONG).show();
+            return null;
         }
 
-        //TODO: paging goes here
+        //BufferingしているのでBufferにしましたがコードの構成から見るとStringの方が分かりやすいかもしれません。
+        StringBuffer url = new StringBuffer();
+        url.append("https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=" + apiKey);
 
-        url += "&start=" + (MAX_RESULTS_PER_PAGE * (currentResultsPage - 1) + 1);
-        url += "&count=" + MAX_RESULTS_PER_PAGE;
-        url += "&format=json";
+        //緯度の設定
+        url.append("&lat=" + coordinates.split(",")[0]);
 
-        Log.d("url",url);
+        //経度の設定
+        url.append("&lng=" + coordinates.split(",")[1]);
 
-        return url;
+        //検索範囲の設定。APIの順番で保存していますのでindexがあれば一致します。ただ、API側で1から始まるので値+1します。 参考：https://webservice.recruit.co.jp/doc/hotpepper/reference.html 、「range」に注目
+        url.append("&range=" + (spnDistance.getSelectedItemPosition() + 1));
+
+        if(!edtTxtRestaurantName.getText().toString().isEmpty()){
+            url.append("&name_any=" + edtTxtRestaurantName.getText().toString().trim());
+        }
+
+        url.append("&start=" + (MAX_RESULTS_PER_PAGE * (currentResultsPage - 1) + 1));
+        url.append("&count=" + MAX_RESULTS_PER_PAGE);
+        url.append("&format=json");
+
+        Log.d("url",url.toString());
+
+        return url.toString();
+    }
+
+    private String getCoordinates() {
+
+        if(spnLocation.getSelectedItem().toString().equals("現在地")){
+
+            //本当は前の画面に聞いていますが、使う前にもう一度確認しないとアンドロイドが落ち着かないみたいので、絶対OKもらうようにします。
+            while (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                LocationPermissions.askLocationPermissions(this);
+            }
+
+            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            //GPS_PROVIDERの代わりにNETWORK_PROVIDERもありますがGPSの方が正確です。
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+            if(location == null){
+                //getLastKnownLocationを使っていますので新しい携帯とかそういうサービスが使ったことがないユーザーだったらnullの可能性があります。
+                //本番であればonLocationChanged()イベントリスナーを立てて、ユーザーにちょっと移動することを依頼しますが、今回そこまでやらないと思います。テストするのはパソコンのエミュレータだろうし、簡単に移動することができません。
+                //今回だけ位置情報がなければユーザーに作ってもらうことにしました。
+                Toast.makeText(this, "位置情報がありません。Google Maps等を一旦開いてから戻ってください。", Toast.LENGTH_LONG).show();
+
+                //携帯にGoogle Mapsアプリケーションがあれば私が開いてあげます。
+                Uri gmmIntentUri = Uri.parse("geo:34.67274672754893, 135.65652437366944");  //東大阪市の大好きな展望台です。
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(mapIntent);
+                }
+            }
+
+            return location.getLatitude() + "," + location.getLongitude();
+        }
+
+        //最悪の場合はエラーになります。
+        return null;
+
     }
 
     //検索条件を表示・非表示の切り替え

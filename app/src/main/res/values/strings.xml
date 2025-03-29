@@ -17,4 +17,21 @@
     <string name="current_page">%1d / %2d</string>
     <string name="search_failed_intro">条件に該当するお店がありません</string>
     <string name="search_failed_finetext">条件を更新してもう一度検索してみてください。</string>
+    <string name="additional_parameters_intro">追加項目（任意）</string>
+    <string name="spinner_continuation">から</string>
+    <string name="meters">m</string>
+    <string name="within">以内</string>
+    <!-- GPSスタートラインスピナーのアイテム -->
+    <string-array name="locations_selector">
+        <item>現在地</item>
+        <item>地域を指定</item>
+    </string-array>
+    <!-- 距離スピナーのアイテム -->
+    <string-array name="distance_selector">
+        <item>300</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>2000</item>
+        <item>3000</item>
+    </string-array>
 </resources>

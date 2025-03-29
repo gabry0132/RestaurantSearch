@@ -14,6 +14,9 @@ compose-material3-adaptive = "1.4.0-alpha11"
 volley = "1.2.1"
 cardview = "1.0.0"
 glide = "4.16.0"
+play-services-location = "21.3.0"
+work-runtime = "2.10.0"
+concurrent-listenablefuture = "1.0.0-beta01"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -30,6 +33,10 @@ compose-material3-adaptive = { module = "androidx.compose.material3:material3-ad
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
 cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
+work-runtime = { module = "androidx.work:work-runtime", version.ref = "work-runtime" }
+concurrent-listenablefuture = { module = "androidx.concurrent:concurrent-listenablefuture-callback", version.ref = "concurrent-listenablefuture" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

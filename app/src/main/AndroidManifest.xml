@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
     <!-- ネットと繋げるため -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 携帯のGPSを使うため。アンドロイド12以上なら両方が必要です -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:usesCleartextTraffic="true"
@@ -18,7 +21,7 @@
         <activity
             android:name=".RestaurantsListActivity"
             android:parentActivityName=".MainActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/beige"
     tools:context=".MainActivity">
 
     <TextView
@@ -20,55 +21,53 @@
         app:layout_constraintVertical_bias="0.107"
         tools:text="@string/main_title" />
 
-    <RelativeLayout
-        android:id="@+id/relLayoutSearchByName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/searchByStoreNameGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.21203831" />
+
+    <EditText
+        android:id="@+id/edtTxtRestaurantName"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_below="@id/searchByStoreNameGuideline"
+        android:layout_marginTop="24dp"
+        android:ems="10"
+        android:hint="@string/store_name_hint"
+        android:importantForAutofill="no"
+
+        android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@+id/txtExtraParamsIntro" />
+
+
+    <Button
+        android:id="@+id/btnSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/searchByStoreNameGuideline"
+        android:layout_toEndOf="@+id/edtTxtRestaurantName"
+        android:onClick="invokeNextPageAndSearch"
+        android:padding="20dp"
+        android:text="@string/store_search"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtMainTitle">
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/searchByStoreNameGuideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.21203831" />
-
-        <EditText
-            android:id="@+id/edtTxtRestaurantName"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_below="@id/searchByStoreNameGuideline"
-            android:layout_marginStart="30dp"
-            android:ems="10"
-            android:hint="@string/store_name_hint"
-            android:importantForAutofill="no"
-            android:inputType="text"
-
-            />
-
-        <Button
-            android:id="@+id/btnSearch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/searchByStoreNameGuideline"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/edtTxtRestaurantName"
-            android:onClick="invokeNextPageAndSearch"
-            android:text="@string/store_search" />
-
-    </RelativeLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.74" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="674dp" />
+        app:layout_constraintGuide_end="164dp" />
 
     <TextView
         android:id="@+id/txtCredits"
@@ -82,5 +81,90 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline"
         tools:ignore="UsingOnClickInXml" />
+
+    <TextView
+        android:id="@+id/txtExtraParamsIntro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="280dp"
+        android:text="@string/additional_parameters_intro"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/txtMainTitle" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="16dp" />
+
+    <Spinner
+        android:id="@+id/spnLocation"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="70dp"
+        android:entries="@array/locations_selector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@+id/txtMainTitle" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.09975669" />
+
+    <TextView
+        android:id="@+id/txtSpinnerContinuationText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/spinner_continuation"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/spnLocation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.149"
+        app:layout_constraintStart_toEndOf="@+id/spnLocation"
+        app:layout_constraintTop_toTopOf="@+id/spnLocation"
+        app:layout_constraintVertical_bias="0.529" />
+
+    <Spinner
+        android:id="@+id/spnDistance"
+        android:layout_width="110dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="36dp"
+        android:entries="@array/distance_selector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.36"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spnLocation" />
+
+    <TextView
+        android:id="@+id/txtDistanceSpinnerContinuationText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/meters"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/spnDistance"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toEndOf="@+id/spnDistance"
+        app:layout_constraintTop_toTopOf="@+id/spnDistance" />
+
+    <TextView
+        android:id="@+id/txtWithin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/within"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/txtDistanceSpinnerContinuationText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintStart_toEndOf="@+id/txtDistanceSpinnerContinuationText"
+        app:layout_constraintTop_toTopOf="@+id/txtDistanceSpinnerContinuationText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,10 +4,13 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/beige"
     tools:context=".RestaurantsListActivity">
 
     <RelativeLayout
         android:id="@+id/relLayoutTopMostPanel"
+        android:translationZ="1dp"
+        android:background="@color/beige"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -83,17 +86,64 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/txtHideSearchParamsIntro">
 
+                <Spinner
+                    android:layout_width="200dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/spnLocation"
+                    android:layout_margin="10dp"
+                    android:entries="@array/locations_selector" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtFromDistanceContinuationText"
+                    android:textSize="16sp"
+                    android:layout_toEndOf="@+id/spnLocation"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/spinner_continuation" />
+
+                <Spinner
+                    android:layout_width="110dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/spnDistance"
+                    android:layout_margin="10dp"
+                    android:layout_below="@+id/spnLocation"
+                    android:entries="@array/distance_selector" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtMeters"
+                    android:textSize="16sp"
+                    android:layout_toEndOf="@+id/spnDistance"
+                    android:layout_alignTop="@+id/spnDistance"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/meters" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtWithin"
+                    android:textSize="16sp"
+                    android:layout_toEndOf="@+id/txtMeters"
+                    android:layout_alignTop="@+id/spnDistance"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginStart="15dp"
+                    android:text="@string/within" />
+
+
                 <EditText
                     android:id="@+id/edtTxtRestaurantName"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
+                    android:layout_below="@+id/spnDistance"
                     android:layout_margin="10dp"
                     android:ems="10"
                     android:hint="@string/store_name_hint"
                     android:importantForAutofill="no"
-                    android:inputType="text"
-
-                    />
+                    android:inputType="text" />
 
                 <!-- layout_belowのポインターは必ず最後のedtTxtにしてください。 -->
                 <Button
@@ -119,7 +169,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/relLayoutTopMostPanel"
+        android:layout_marginTop="115dp"
         android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -190,8 +240,11 @@
 
     <RelativeLayout
         android:id="@+id/relLayoutSearchFailedMessageHolder"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:background="@color/beige"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/relLayoutTopMostPanel"
+        android:textAlignment="center"
         android:visibility="gone">
 
         <TextView
