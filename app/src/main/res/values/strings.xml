@@ -26,6 +26,10 @@
     <string name="estimated_price">Estimated Price</string>
     <string name="access">Access</string>
     <string name="distance">Distance</string>
+    <string name="latitude">緯度</string>
+    <string name="longitude">経度</string>
+    <string name="google_maps">Google Maps等を利用して検索位置となる緯度と経度を取得してください。</string>
+    <string name="open_maps">地図を見る</string>
     <!-- GPSスタートラインスピナーのアイテム -->
     <string-array name="locations_selector">
         <item>現在地</item>

@@ -59,15 +59,15 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.74" />
+        app:layout_constraintTop_toBottomOf="@+id/edtTxtRestaurantName"
+        app:layout_constraintVertical_bias="0.175" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_end="164dp" />
+        app:layout_constraintGuide_percent="0.89" />
 
     <TextView
         android:id="@+id/txtCredits"
@@ -86,7 +86,7 @@
         android:id="@+id/txtExtraParamsIntro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="280dp"
+        android:layout_marginTop="348dp"
         android:text="@string/additional_parameters_intro"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -99,7 +99,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="16dp" />
+        app:layout_constraintGuide_percent="0.04136253" />
 
     <Spinner
         android:id="@+id/spnLocation"
@@ -107,6 +107,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="70dp"
         android:entries="@array/locations_selector"
+        android:spinnerMode="dropdown"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
@@ -117,7 +118,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.09975669" />
+        app:layout_constraintGuide_percent="0.10218978" />
 
     <TextView
         android:id="@+id/txtSpinnerContinuationText"
@@ -127,21 +128,80 @@
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@+id/spnLocation"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.149"
+        app:layout_constraintHorizontal_bias="0.15"
         app:layout_constraintStart_toEndOf="@+id/spnLocation"
-        app:layout_constraintTop_toTopOf="@+id/spnLocation"
-        app:layout_constraintVertical_bias="0.529" />
+        app:layout_constraintTop_toTopOf="@+id/spnLocation" />
+
+    <RelativeLayout
+        android:id="@+id/relLayoutCoordinates"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.22"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/spnLocation">
+
+        <TextView
+            android:id="@+id/txtCoordinatesHelper"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="@string/google_maps" />
+
+        <Button
+            android:id="@+id/btnOpenMaps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/txtCoordinatesHelper"
+            android:onClick="openMapsApp"
+            android:text="@string/open_maps" />
+
+        <EditText
+            android:id="@+id/edtTxtLatitude"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtCoordinatesHelper"
+            android:layout_marginStart="20dp"
+            android:hint="@string/latitude"
+            tools:layout_editor_absoluteX="51dp"
+            tools:layout_editor_absoluteY="266dp" />
+
+        <EditText
+            android:id="@+id/edtTxtLongitude"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/edtTxtLatitude"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:hint="@string/longitude"
+            tools:layout_editor_absoluteX="55dp"
+            tools:layout_editor_absoluteY="328dp" />
+
+        <TextView
+            android:id="@+id/txtCoordinatesContinuationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/edtTxtLongitude"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@+id/edtTxtLongitude"
+            android:text="@string/spinner_continuation"
+            android:textSize="20sp" />
+
+    </RelativeLayout>
 
     <Spinner
         android:id="@+id/spnDistance"
         android:layout_width="110dp"
         android:layout_height="50dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="8dp"
         android:entries="@array/distance_selector"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.36"
+        app:layout_constraintHorizontal_bias="0.44"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spnLocation" />
+        app:layout_constraintTop_toBottomOf="@+id/relLayoutCoordinates" />
 
     <TextView
         android:id="@+id/txtDistanceSpinnerContinuationText"
@@ -151,7 +211,7 @@
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@+id/spnDistance"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintHorizontal_bias="0.05"
         app:layout_constraintStart_toEndOf="@+id/spnDistance"
         app:layout_constraintTop_toTopOf="@+id/spnDistance" />
 
@@ -166,5 +226,12 @@
         app:layout_constraintHorizontal_bias="0.15"
         app:layout_constraintStart_toEndOf="@+id/txtDistanceSpinnerContinuationText"
         app:layout_constraintTop_toTopOf="@+id/txtDistanceSpinnerContinuationText" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="301dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

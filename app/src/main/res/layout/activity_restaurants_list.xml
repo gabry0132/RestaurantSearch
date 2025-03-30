@@ -9,10 +9,10 @@
 
     <RelativeLayout
         android:id="@+id/relLayoutTopMostPanel"
-        android:translationZ="1dp"
-        android:background="@color/beige"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/beige"
+        android:translationZ="1dp">
 
         <TextView
             android:id="@+id/txtSearchResults"
@@ -87,51 +87,107 @@
                 android:layout_below="@+id/txtHideSearchParamsIntro">
 
                 <Spinner
+                    android:id="@+id/spnLocation"
                     android:layout_width="200dp"
                     android:layout_height="50dp"
-                    android:id="@+id/spnLocation"
                     android:layout_margin="10dp"
                     android:entries="@array/locations_selector" />
 
-                <TextView
+                <RelativeLayout
+                    android:id="@+id/relLayoutCoordinates"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/spnLocation"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/txtCoordinatesHelper"
+                        android:layout_width="250dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/google_maps" />
+
+                    <Button
+                        android:id="@+id/btnOpenMaps"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_toEndOf="@id/txtCoordinatesHelper"
+                        android:onClick="openMapsApp"
+                        android:text="@string/open_maps" />
+
+                    <EditText
+                        android:id="@+id/edtTxtLatitude"
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/txtCoordinatesHelper"
+                        android:layout_marginStart="20dp"
+                        android:hint="@string/latitude"
+                        tools:layout_editor_absoluteX="51dp"
+                        tools:layout_editor_absoluteY="266dp" />
+
+                    <EditText
+                        android:id="@+id/edtTxtLongitude"
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/edtTxtLatitude"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="5dp"
+                        android:hint="@string/longitude"
+                        tools:layout_editor_absoluteX="55dp"
+                        tools:layout_editor_absoluteY="328dp" />
+
+                    <TextView
+                        android:id="@+id/txtCoordinatesContinuationText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@+id/edtTxtLongitude"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_toEndOf="@+id/edtTxtLongitude"
+                        android:text="@string/spinner_continuation"
+                        android:textSize="16sp" />
+
+                </RelativeLayout>
+
+                <TextView
                     android:id="@+id/txtFromDistanceContinuationText"
-                    android:textSize="16sp"
-                    android:layout_toEndOf="@+id/spnLocation"
-                    android:layout_marginTop="25dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="@string/spinner_continuation" />
+                    android:layout_marginTop="25dp"
+                    android:layout_toEndOf="@+id/spnLocation"
+                    android:text="@string/spinner_continuation"
+                    android:textSize="16sp" />
 
                 <Spinner
+                    android:id="@+id/spnDistance"
                     android:layout_width="110dp"
                     android:layout_height="50dp"
-                    android:id="@+id/spnDistance"
+                    android:layout_below="@+id/relLayoutCoordinates"
                     android:layout_margin="10dp"
-                    android:layout_below="@+id/spnLocation"
                     android:entries="@array/distance_selector" />
 
                 <TextView
+                    android:id="@+id/txtMeters"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/txtMeters"
-                    android:textSize="16sp"
-                    android:layout_toEndOf="@+id/spnDistance"
                     android:layout_alignTop="@+id/spnDistance"
-                    android:layout_marginTop="15dp"
                     android:layout_marginStart="5dp"
-                    android:text="@string/meters" />
+                    android:layout_marginTop="15dp"
+                    android:layout_toEndOf="@+id/spnDistance"
+                    android:text="@string/meters"
+                    android:textSize="16sp" />
 
                 <TextView
+                    android:id="@+id/txtWithin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/txtWithin"
-                    android:textSize="16sp"
-                    android:layout_toEndOf="@+id/txtMeters"
                     android:layout_alignTop="@+id/spnDistance"
-                    android:layout_marginTop="15dp"
                     android:layout_marginStart="15dp"
-                    android:text="@string/within" />
+                    android:layout_marginTop="15dp"
+                    android:layout_toEndOf="@+id/txtMeters"
+                    android:text="@string/within"
+                    android:textSize="16sp" />
 
 
                 <EditText
@@ -216,8 +272,8 @@
                 android:backgroundTint="@color/sky_blue"
                 android:contentDescription="@string/next_page_description"
                 android:onClick="initiateSearch"
-                android:visibility="gone"
-                android:textColor="@color/black" />
+                android:textColor="@color/black"
+                android:visibility="gone" />
 
         </RelativeLayout>
 
@@ -240,10 +296,10 @@
 
     <RelativeLayout
         android:id="@+id/relLayoutSearchFailedMessageHolder"
-        android:background="@color/beige"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/relLayoutTopMostPanel"
+        android:background="@color/beige"
         android:textAlignment="center"
         android:visibility="gone">
 

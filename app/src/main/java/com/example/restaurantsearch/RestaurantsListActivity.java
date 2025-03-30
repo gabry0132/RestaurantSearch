@@ -6,8 +6,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.transition.Transition;
+import android.transition.TransitionSet;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -23,6 +26,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.AutoTransition;
+import androidx.transition.ChangeBounds;
 import androidx.transition.TransitionManager;
 
 import java.util.ArrayList;
@@ -31,8 +36,8 @@ public class RestaurantsListActivity extends AppCompatActivity {
 
     private boolean searchParamsExpanded;               //検索条件を表示・非表示の切り替えに使います。
     private RecyclerView recView;                       //Webで言うとDivです。一つ一つのお店を格納するレイアウト要素。
-    private RelativeLayout relLayoutObfuscationPanel;
-    private Button btnSearch, btnToPreviousPage, btnToNextPage;
+    private RelativeLayout relLayoutObfuscationPanel, relLayoutCollapsedSearchParams, relLayoutExpandedSearchParams, relLayoutCoordinates;
+    private Button btnSearch, btnOpenMaps, btnToPreviousPage, btnToNextPage;
     private ApiCallsHelper apiCallsHelper;              //データ取得のために使います。
     private String apiKey;                              //環境変数の読み込みが失敗したため、直接プログラムに書きます。
     public static boolean currentlyLoading;             //グローバル変数がよくないですが、一回しか呼ぶことがないのでわざわざSingleton Class作らなくてもいいと思います。
@@ -44,8 +49,8 @@ public class RestaurantsListActivity extends AppCompatActivity {
     private int currentResultsPage;                     //結果画面の何ページ目
 
     //UIのView
-    private EditText edtTxtRestaurantName;
-    private TextView txtPageNumber;
+    private EditText edtTxtRestaurantName, edtTxtLatitude, edtTxtLongitude;
+    private TextView txtPageNumber, txtFromDistanceContinuationText;
     private Spinner spnLocation, spnDistance;
     private Location locationCurrentSearch;                //検索の際に使う位置情報。
     private static final int EARTH_RADIUS = 6371;          //検索位置からお店までの距離のために使う。Kmです。
@@ -67,25 +72,48 @@ public class RestaurantsListActivity extends AppCompatActivity {
         maxPageNumber = 1;  //データがもらったら上書きされます。データがない時に１にすると「次のページへ」ボタンが表示されないので１にします。
         currentlyLoading = false;
         searchParamsExpanded = false;
-        locationCurrentSearch = null;   //APIのURLを設定する際に求めます。
+        locationCurrentSearch = null;   //APIのURLを設定する際に求めます。現在地で検索しないと代入されません。
         recView = findViewById(R.id.recView);
         btnSearch = findViewById(R.id.btnSearch);
+        btnOpenMaps = findViewById(R.id.btnOpenMaps);
         spnLocation = findViewById(R.id.spnLocation);
         spnDistance = findViewById(R.id.spnDistance);
         btnToNextPage = findViewById(R.id.btnNextPage);
         txtPageNumber = findViewById(R.id.txtPageNumber);
+        edtTxtLatitude = findViewById(R.id.edtTxtLatitude);
+        edtTxtLongitude = findViewById(R.id.edtTxtLongitude);
         btnToPreviousPage = findViewById(R.id.btnPreviousPage);
         edtTxtRestaurantName = findViewById(R.id.edtTxtRestaurantName);
+        relLayoutCoordinates = findViewById(R.id.relLayoutCoordinates);
         relLayoutObfuscationPanel = findViewById(R.id.relLayoutObfuscationPanel);
+        relLayoutExpandedSearchParams = findViewById(R.id.relLayoutExpandedSearchParams);
+        relLayoutCollapsedSearchParams = findViewById(R.id.relLayoutCollapsedSearchParams);
+        txtFromDistanceContinuationText = findViewById(R.id.txtFromDistanceContinuationText);
+
+        //MainActivityと同じようにSpinnerにEvent Listenerを追加します。
+        spnLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                //MainActivityと本画面の検索項目・レイアウトを一致するつもりではないので同じメソッドでも変わる可能性があるため、メソッドを共有するのではなく本ページにコピーします。
+                handleLocationSpinnerSelectionChanged((Spinner) adapterView);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         //前のページからデータを取得します。
         Intent intent = getIntent();
         edtTxtRestaurantName.setText(intent.getStringExtra("restaurantName"));
-        spnLocation.setSelection(intent.getIntExtra("spnLocationIndex", 1));
+        spnLocation.setSelection(intent.getIntExtra("spnLocationIndex", 1));    //EventListenerですぐに設定されません。この後直接呼びます。
+        edtTxtLatitude.setText(intent.getStringExtra("latitude"));      //空文字が送信される場合もあります。
+        edtTxtLongitude.setText(intent.getStringExtra("longitude"));    //空文字が送信される場合もあります。
         spnDistance.setSelection(intent.getIntExtra("spnDistanceIndex", 1));
 
         //検索処理の準備と実行を行います。
-        //画面内のボタンでも呼べるようにしたいので全部が自分のメソッドになります。
+        //画面内のボタンでも呼べるようにしたいのでViewのパラメータが必要となります。
         initiateSearch(btnSearch);
 
     }
@@ -102,7 +130,6 @@ public class RestaurantsListActivity extends AppCompatActivity {
         } else {
             currentResultsPage = 1;
         }
-
 
         //TODO: input check once more. the user should be checked equally as thoroughly every time they search, and from any page
 
@@ -152,6 +179,7 @@ public class RestaurantsListActivity extends AppCompatActivity {
         currentlyLoading = true;
         //ボタンをクリックできないようにします。
         btnSearch.setEnabled(false);
+        btnOpenMaps.setEnabled(false);
         btnToPreviousPage.setEnabled(false);
         btnToNextPage.setEnabled(false);
         //txtViewにも入力できないようにします。
@@ -163,6 +191,7 @@ public class RestaurantsListActivity extends AppCompatActivity {
         currentlyLoading = false;
         //ボタンをクリックできるように戻します。
         btnSearch.setEnabled(true);
+        btnOpenMaps.setEnabled(true);
         btnToPreviousPage.setEnabled(true);
         btnToNextPage.setEnabled(true);
         //txtViewにまた入力できなるようにします。
@@ -216,7 +245,6 @@ public class RestaurantsListActivity extends AppCompatActivity {
                     handleNoResultsFromSearch();
 
                 }
-
             }
 
             @Override
@@ -282,13 +310,9 @@ public class RestaurantsListActivity extends AppCompatActivity {
 
     private String setUrlForSearch() {
 
-        //位置情報を求めます。
         locationCurrentSearch = getSearchLocation();
 
-        if(locationCurrentSearch == null){
-            Toast.makeText(this, "座標が見つかりませんでした。", Toast.LENGTH_LONG).show();
-            return null;
-        }
+        if(locationCurrentSearch == null) return null;  //前のメソッドからのToastでユーザーに説明しています。
 
         //BufferingしているのでBufferにしましたがコードの構成から見るとStringの方が分かりやすいかもしれません。
         StringBuffer url = new StringBuffer();
@@ -303,6 +327,7 @@ public class RestaurantsListActivity extends AppCompatActivity {
         //検索範囲の設定。APIの順番で保存していますのでindexがあれば一致します。ただ、API側で1から始まるので値+1します。 参考：https://webservice.recruit.co.jp/doc/hotpepper/reference.html 、「range」に注目
         url.append("&range=" + (spnDistance.getSelectedItemPosition() + 1));
 
+        //追加の任意項目があればここで設定します。
         if(!edtTxtRestaurantName.getText().toString().isEmpty()){
             url.append("&name_any=" + edtTxtRestaurantName.getText().toString().trim());
         }
@@ -318,37 +343,55 @@ public class RestaurantsListActivity extends AppCompatActivity {
 
     private Location getSearchLocation() {
 
-        if(spnLocation.getSelectedItem().toString().equals("現在地")){
-
-            //本当は前の画面に聞いていますが、使う前にもう一度確認しないとアンドロイドが落ち着かないみたいので、絶対OKもらうようにします。
-            while (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                LocationPermissions.askLocationPermissions(this);
-            }
-
-            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            //GPS_PROVIDERの代わりにNETWORK_PROVIDERもありますがGPSの方が正確です。
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-            if(location == null){
-                //getLastKnownLocationを使っていますので新しい携帯とかそういうサービスが使ったことがないユーザーだったらnullの可能性があります。
-                //本番であればonLocationChanged()イベントリスナーを立てて、ユーザーにちょっと移動することを依頼しますが、今回そこまでやらないと思います。テストするのはパソコンのエミュレータだろうし、簡単に移動することができません。
-                //今回だけ位置情報がなければユーザーに作ってもらうことにしました。
-                Toast.makeText(this, "位置情報がありません。Google Maps等を一旦開いてから戻ってください。", Toast.LENGTH_LONG).show();
-
-                //携帯にGoogle Mapsアプリケーションがあれば私が開いてあげます。
-                Uri gmmIntentUri = Uri.parse("geo:34.67274672754893, 135.65652437366944");  //東大阪市の大好きな展望台です。
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                if (mapIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(mapIntent);
-                }
-            }
-
-            return location;
+        //本当は前の画面に聞いていますが、使う前にもう一度確認しないとアンドロイドが落ち着かないみたいので、絶対OKもらうようにします。
+        while (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            LocationPermissions.askLocationPermissions(this);
         }
 
-        //最悪の場合はエラーになります。
-        return null;
+        //LocationManagerで作られたLocationが必ず正しい必須項目を持っています。参考：https://developer.android.com/reference/android/location/Location
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        //GPS_PROVIDERの代わりにNETWORK_PROVIDERもありますがGPSの方が正確です。
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        if(location == null){
+            //getLastKnownLocationを使っていますので新しい携帯とかそういうサービスが使ったことがないユーザーだったらnullの可能性があります。
+            //本番であればonLocationChanged()イベントリスナーを立てて、ユーザーにちょっと移動することを依頼しますが、今回そこまでやらないと思います。テストするのはパソコンのエミュレータだろうし、簡単に移動することができません。
+            //今回だけ位置情報がなければユーザーに作ってもらうことにしました。
+            Toast.makeText(this, "位置情報がありません。Google Maps等を一旦開いてから戻ってください。", Toast.LENGTH_LONG).show();
+
+            //携帯にGoogle Mapsアプリケーションがあれば私が開きます。
+            MapsOpener.openMapsApp(this, 35.71014978852772, 139.81068430321494); //東京スカイツリーです。
+
+        }
+
+        /*
+
+        ここから、ユーザーが入力した座標があれば取得したものを上書きします。
+        このアプリケーションではlocation型オブジェクトは座標の共有にしか使いませんが、現在地で検索していない場合にも位置情報を取得するのが必須です。
+        そうしないとlocationCurrentSearchの代入がスキップされて、代わりに偽物の空locationにする必要があります。locationCurrentSearch変数にはあってはならないことです。
+
+        空のlocation型オブジェクトに座標を設定する悪い例：
+         Location location = new Location("");  ＜－ providerがない
+         location.setLatitude(Double.parseDouble(edtTxtLatitude.getText().toString()));
+         location.setLongitude(Double.parseDouble((edtTxtLongitude.getText().toString())));
+
+        将来的にこのlocationCurrentStateを使うのであれば、普通の状態ではないlocation型オブジェクトを使うことになるので危ないです。
+        現在地が求められていない時にも取得します。それで、問題ないlocationオブジェクトがあるはず(LocationManager OK -> System Services OK)だからそれに座標を上書きします。
+
+        !　座標以外のためにlocationCurrentSearchを使うなら要注意です !
+        https://developer.android.com/reference/android/location/Location
+        !　LocationManager経由で作られなかったLocation型オブジェクトがエラーを発生する原因となりえます　!
+
+         */
+
+        //ユーザーが「地域を指定」を選んで、座標を入力した場合
+        if(spnLocation.getSelectedItemPosition() == 1 && location != null){
+            location.setLatitude(Double.parseDouble(edtTxtLatitude.getText().toString()));
+            location.setLongitude(Double.parseDouble((edtTxtLongitude.getText().toString())));
+        }
+
+        //最悪の場合はnullを返します。
+        return location;
 
     }
 
@@ -357,20 +400,48 @@ public class RestaurantsListActivity extends AppCompatActivity {
         //まだロード中だったらクリックさせません。
         if(currentlyLoading) return;
 
-        RelativeLayout relLayoutCollapsed = findViewById(R.id.relLayoutCollapsedSearchParams);
-        RelativeLayout relLayoutExpanded = findViewById(R.id.relLayoutExpandedSearchParams);
         //現在の状況を切り替えます
         if(searchParamsExpanded){
-            TransitionManager.beginDelayedTransition(relLayoutCollapsed);
-            relLayoutCollapsed.setVisibility(View.VISIBLE);
-            relLayoutExpanded.setVisibility(View.GONE);
+            relLayoutCollapsedSearchParams.setVisibility(View.VISIBLE);
+            relLayoutExpandedSearchParams.setVisibility(View.GONE);
+
             searchParamsExpanded = false;
         } else {
-            TransitionManager.beginDelayedTransition(relLayoutExpanded);
-            relLayoutExpanded.setVisibility(View.VISIBLE);
-            relLayoutCollapsed.setVisibility(View.GONE);
+            relLayoutExpandedSearchParams.setVisibility(View.VISIBLE);
+            relLayoutCollapsedSearchParams.setVisibility(View.GONE);
+
+            //表示するときにspnLocationの選択による座標も表示したいのでもう一度そのチェックを実行します。
+            handleLocationSpinnerSelectionChanged(spnLocation);
+
             searchParamsExpanded = true;
         }
+    }
+
+    private void handleLocationSpinnerSelectionChanged(Spinner spinner){
+        //SelectionChangedなので絶対ユーザーが見える時に実行されるコードになるはずのですが、念のためにチェックを入れます。
+        if(currentlyLoading) return;
+
+        //アニメーションを付けます。
+        TransitionManager.beginDelayedTransition(relLayoutExpandedSearchParams, new ChangeBounds().setDuration(100));
+
+        if(spinner.getSelectedItemPosition() == 1){ //「指定」選択を選んだ場合
+
+            //座標入力パネルを表示。見えるようになったと言っても、外側のRelLayoutが見れない限り表示できません。外側のRelLayoutが見れるまでの準備だとします。
+            relLayoutCoordinates.setVisibility(View.VISIBLE);
+            //「から」メッセージを座標の隣に移動します（本当は二つの非表示の切り替えです）
+            txtFromDistanceContinuationText.setVisibility(View.GONE);
+
+        } else {  //現在地を選んだ場合
+
+            //座標入力パネルを非表示
+            relLayoutCoordinates.setVisibility(View.GONE);
+            //「から」メッセージを上に戻します。
+            txtFromDistanceContinuationText.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void openMapsApp(View view){
+        MapsOpener.openMapsApp(this);
     }
 
 }
