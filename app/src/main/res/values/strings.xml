@@ -21,6 +21,11 @@
     <string name="spinner_continuation">から</string>
     <string name="meters">m</string>
     <string name="within">以内</string>
+    <string name="shop_name">Shop Name</string>
+    <string name="shop_genre">Shop Genre</string>
+    <string name="estimated_price">Estimated Price</string>
+    <string name="access">Access</string>
+    <string name="distance">Distance</string>
     <!-- GPSスタートラインスピナーのアイテム -->
     <string-array name="locations_selector">
         <item>現在地</item>

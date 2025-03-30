@@ -47,6 +47,8 @@ public class RestaurantsListActivity extends AppCompatActivity {
     private EditText edtTxtRestaurantName;
     private TextView txtPageNumber;
     private Spinner spnLocation, spnDistance;
+    private Location locationCurrentSearch;                //検索の際に使う位置情報。
+    private static final int EARTH_RADIUS = 6371;          //検索位置からお店までの距離のために使う。Kmです。
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,7 @@ public class RestaurantsListActivity extends AppCompatActivity {
         maxPageNumber = 1;  //データがもらったら上書きされます。データがない時に１にすると「次のページへ」ボタンが表示されないので１にします。
         currentlyLoading = false;
         searchParamsExpanded = false;
+        locationCurrentSearch = null;   //APIのURLを設定する際に求めます。
         recView = findViewById(R.id.recView);
         btnSearch = findViewById(R.id.btnSearch);
         spnLocation = findViewById(R.id.spnLocation);
@@ -107,6 +110,14 @@ public class RestaurantsListActivity extends AppCompatActivity {
 
         //URLの設定を行います
         String url = setUrlForSearch();
+
+        //設定中に問題が発生した場合はページを閉じます。
+        //Toastとかでユーザーにエラーを知らせるのがこの時点ではなく、発生した瞬間です。そうするとどんな問題なのか具体的にお知らせできます。
+        if(url == null){
+            Intent returnIntent = new Intent(this, MainActivity.class);
+            startActivity(returnIntent);
+            finish();
+        }
 
         //APIの実行に使うオブジェクトの代入
         apiCallsHelper = new ApiCallsHelper(this);
@@ -180,6 +191,12 @@ public class RestaurantsListActivity extends AppCompatActivity {
                     //直前ヒットなしの検索から、成功モードに切り替えます
                     handleSuccessfulSearch();
 
+                    //検索の位置から店ごととの距離を計算します。位置情報がなければスキップします。
+                    //APIの結果が既に近い順に並べていますが、具体的にどれくらい遠いか表示したいです。
+                    if(locationCurrentSearch != null){
+                        setDistanceOnAllShops(shopsList);
+                    }
+
                     //データがもらえたのでRecyclerViewに設定します。
                     ShopsRecyclerViewAdapter adapter = new ShopsRecyclerViewAdapter(RestaurantsListActivity.this);
                     adapter.setShops(shopsList);
@@ -209,6 +226,36 @@ public class RestaurantsListActivity extends AppCompatActivity {
         });
     }
 
+    private void setDistanceOnAllShops(ArrayList<Shop> shopsList) {
+        for (Shop shop :
+                shopsList) {
+            int distance = determineShopDistanceFromSearch(shop);
+            shop.setDistanceFromSearchCoordinates(distance + "");
+        }
+    }
+
+    private int determineShopDistanceFromSearch(Shop shop) {
+        //lat、lngがDoubleですが　「equirectangular approximation」（等角近似）を利用して計算しますのでRadian形式に変換します（double型が変りません）。
+        double latSearchRad = Math.toRadians(locationCurrentSearch.getLatitude());
+        double lngSearchRad = Math.toRadians(locationCurrentSearch.getLongitude());
+        double latShopRad = Math.toRadians(Double.parseDouble(shop.getLatitude()));
+        double lngShopRad = Math.toRadians(Double.parseDouble(shop.getLongitude()));
+
+        //世界中の計算ではない（APIにより最大検索距離3000m）ですので Harvestineとか Vinecentyとか、複雑な数式を使わなくていいです。
+        //最も簡単な数式で距離を計算します。参考資料：https://www.baeldung.com/java-find-distance-between-points　（2番：Equirectangular Distance Approximation に注目）。
+        //Google Mapsが表示する徒歩距離等ではなく、マンハッタン距離の形になります。道の案内のためではなく、どれぐらい遠いかイメージするための値になりますのでこのままでいいとします。
+        //本当に道の案内も含めて、具体的に徒歩で何分とか、そういう情報がGoogle Maps Apiで取得できるだろうけど今回は対象外だと判断させていただきます。
+        double x = (lngShopRad - lngSearchRad) * Math.cos((latSearchRad + latShopRad) / 2);
+        double y = latShopRad - latSearchRad;
+        double distance = Math.sqrt(x * x + y * y) * EARTH_RADIUS;
+
+        //テスト用
+        //Log.d("distance","distance to " + shop.getLatitude() + "," + shop.getLongitude() + " = " + distance + " and it returns " + ((int) Math.round(distance * 1000)));
+
+        //Km -> m
+        return (int) Math.round(distance * 1000);
+    }
+
     private void handleNoResultsFromSearch() {
         //簡単に再検索できるように、検索条件を表示します。
         if(!searchParamsExpanded) revertSearchParamsMenuState(findViewById(R.id.txtExpandSearchParamsIntro));
@@ -235,10 +282,10 @@ public class RestaurantsListActivity extends AppCompatActivity {
 
     private String setUrlForSearch() {
 
-        //lat,lng の形で求めます。
-        String coordinates = getCoordinates();
+        //位置情報を求めます。
+        locationCurrentSearch = getSearchLocation();
 
-        if(coordinates == null){
+        if(locationCurrentSearch == null){
             Toast.makeText(this, "座標が見つかりませんでした。", Toast.LENGTH_LONG).show();
             return null;
         }
@@ -248,10 +295,10 @@ public class RestaurantsListActivity extends AppCompatActivity {
         url.append("https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=" + apiKey);
 
         //緯度の設定
-        url.append("&lat=" + coordinates.split(",")[0]);
+        url.append("&lat=" + locationCurrentSearch.getLatitude());
 
         //経度の設定
-        url.append("&lng=" + coordinates.split(",")[1]);
+        url.append("&lng=" + locationCurrentSearch.getLongitude());
 
         //検索範囲の設定。APIの順番で保存していますのでindexがあれば一致します。ただ、API側で1から始まるので値+1します。 参考：https://webservice.recruit.co.jp/doc/hotpepper/reference.html 、「range」に注目
         url.append("&range=" + (spnDistance.getSelectedItemPosition() + 1));
@@ -269,7 +316,7 @@ public class RestaurantsListActivity extends AppCompatActivity {
         return url.toString();
     }
 
-    private String getCoordinates() {
+    private Location getSearchLocation() {
 
         if(spnLocation.getSelectedItem().toString().equals("現在地")){
 
@@ -297,7 +344,7 @@ public class RestaurantsListActivity extends AppCompatActivity {
                 }
             }
 
-            return location.getLatitude() + "," + location.getLongitude();
+            return location;
         }
 
         //最悪の場合はエラーになります。

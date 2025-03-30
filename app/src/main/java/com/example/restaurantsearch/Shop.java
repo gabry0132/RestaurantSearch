@@ -2,7 +2,7 @@ package com.example.restaurantsearch;
 
 public class Shop {
 
-    private String id, name, genre, address, stationName, latitude, longitude, openingHours, estimatedPrice, access, imageUrl, websiteUrl;
+    private String id, name, genre, address, stationName, latitude, longitude, openingHours, estimatedPrice, access, imageUrl, websiteUrl, distanceFromSearchCoordinates;
 
     public Shop(String id, String name, String genre, String address, String stationName, String latitude, String longitude, String openingHours, String estimatedPrice, String access, String imageUrl, String websiteUrl) {
         this.id = id;
@@ -35,6 +35,15 @@ public class Shop {
                 ", imageUrl='" + imageUrl + '\'' +
                 ", websiteUrl='" + websiteUrl + '\'' +
                 "}\n";
+    }
+
+    public String getDistanceFromSearchCoordinates() {
+        return distanceFromSearchCoordinates;
+    }
+
+    //Shopオブジェクトの作成と距離の計算が別々で行いますのでコンストラクタには入れません。setメソッドで設定します。
+    public void setDistanceFromSearchCoordinates(String distanceFromSearchCoordinates) {
+        this.distanceFromSearchCoordinates = distanceFromSearchCoordinates;
     }
 
     public String getId() {

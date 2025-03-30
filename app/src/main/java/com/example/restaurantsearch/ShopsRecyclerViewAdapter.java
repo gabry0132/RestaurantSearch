@@ -40,6 +40,7 @@ public class ShopsRecyclerViewAdapter extends RecyclerView.Adapter<ShopsRecycler
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         //子クラスが本クラス内にありますので直接フィールドへアクセスできます。
         holder.txtShopName.setText(shops.get(position).getName());
+        holder.txtDistance.setText(shops.get(position).getDistanceFromSearchCoordinates() + "m");
         holder.txtGenre.setText(shops.get(position).getGenre());
         //txtGenreがwidth="wrap-contents"であっても、空文字の場合は右のマージンが表示されるのでgenreがない時に次のtxtEstimatedPriceが右に移動してしまいますので、マージンがいらない場合は削除します。
         if(holder.txtGenre.getText().toString().isEmpty()) removeRightMargin(holder.txtGenre);
@@ -86,13 +87,14 @@ public class ShopsRecyclerViewAdapter extends RecyclerView.Adapter<ShopsRecycler
 
         //ここで作成する変数は親クラスの「onBindViewHolder」に使います。
         private CardView parent;
-        private TextView txtShopName, txtGenre, txtEstimatedPrice, txtAccess;
+        private TextView txtShopName, txtDistance, txtGenre, txtEstimatedPrice, txtAccess;
         private ImageView image;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             parent = itemView.findViewById(R.id.parent);
             txtShopName = itemView.findViewById(R.id.txtShopName);
+            txtDistance = itemView.findViewById(R.id.txtDistance);
             txtGenre = itemView.findViewById(R.id.txtGenre);
             txtEstimatedPrice = itemView.findViewById(R.id.txtEstimatedPrice);
             txtAccess = itemView.findViewById(R.id.txtAccess);
