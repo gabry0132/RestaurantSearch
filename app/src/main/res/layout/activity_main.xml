@@ -8,6 +8,7 @@
     android:background="@color/beige"
     tools:context=".MainActivity">
 
+
     <TextView
         android:id="@+id/txtMainTitle"
         android:layout_width="wrap_content"
@@ -18,9 +19,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.107"
+        app:layout_constraintVertical_bias="0.043"
         tools:text="@string/main_title" />
-
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/searchByStoreNameGuideline"
@@ -34,17 +34,15 @@
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_below="@id/searchByStoreNameGuideline"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="12dp"
         android:ems="10"
         android:hint="@string/store_name_hint"
         android:importantForAutofill="no"
-
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
         app:layout_constraintTop_toBottomOf="@+id/txtExtraParamsIntro" />
-
 
     <Button
         android:id="@+id/btnSearch"
@@ -59,15 +57,15 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtTxtRestaurantName"
-        app:layout_constraintVertical_bias="0.175" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.849" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.89" />
+        app:layout_constraintGuide_end="88dp" />
 
     <TextView
         android:id="@+id/txtCredits"
@@ -86,13 +84,13 @@
         android:id="@+id/txtExtraParamsIntro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="348dp"
+        android:layout_marginTop="10dp"
         android:text="@string/additional_parameters_intro"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/txtMainTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/spnDistance" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
@@ -105,7 +103,7 @@
         android:id="@+id/spnLocation"
         android:layout_width="200dp"
         android:layout_height="50dp"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="40dp"
         android:entries="@array/locations_selector"
         android:spinnerMode="dropdown"
         app:layout_constraintEnd_toEndOf="parent"
@@ -160,24 +158,44 @@
 
         <EditText
             android:id="@+id/edtTxtLatitude"
-            android:layout_width="200dp"
+            android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/txtCoordinatesHelper"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="10dp"
             android:hint="@string/latitude"
             tools:layout_editor_absoluteX="51dp"
             tools:layout_editor_absoluteY="266dp" />
 
+        <TextView
+            android:id="@+id/txtLatitudeError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/edtTxtLatitude"
+            android:layout_alignEnd="@+id/edtTxtLatitude"
+            android:layout_marginTop="13dp"
+            android:textColor="@color/red"
+            android:visibility="gone" />
+
         <EditText
             android:id="@+id/edtTxtLongitude"
-            android:layout_width="200dp"
+            android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/edtTxtLatitude"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
             android:hint="@string/longitude"
             tools:layout_editor_absoluteX="55dp"
             tools:layout_editor_absoluteY="328dp" />
+
+        <TextView
+            android:id="@+id/txtLongitudeError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/edtTxtLongitude"
+            android:layout_alignEnd="@+id/edtTxtLongitude"
+            android:layout_marginTop="13dp"
+            android:textColor="@color/red"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/txtCoordinatesContinuationText"
@@ -233,5 +251,59 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_begin="301dp" />
+
+    <TextView
+        android:id="@+id/txtShopGenreIntro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/shop_genre_intro"
+        app:layout_constraintEnd_toStartOf="@+id/guideline4"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@+id/edtTxtRestaurantName" />
+
+    <Spinner
+        android:id="@+id/spnShopGenre"
+        android:layout_width="210dp"
+        android:layout_height="40dp"
+        android:entries="@array/genres"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@+id/txtShopGenreIntro" />
+
+    <TextView
+        android:id="@+id/txtBudgetIntro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/budget_intro"
+        app:layout_constraintEnd_toStartOf="@+id/guideline4"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@+id/spnShopGenre" />
+
+    <Spinner
+        android:id="@+id/spnBudget"
+        android:layout_width="210dp"
+        android:layout_height="40dp"
+        android:entries="@array/budgets"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@+id/txtBudgetIntro" />
+
+    <TextView
+        android:id="@+id/txtNameDisablingBudget"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:text="@string/name_disables_budget_warning"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/edtTxtRestaurantName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/edtTxtRestaurantName"
+        app:layout_constraintTop_toTopOf="@+id/edtTxtRestaurantName" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

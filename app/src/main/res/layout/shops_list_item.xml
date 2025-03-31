@@ -12,7 +12,6 @@
     app:cardCornerRadius="10dp"
     app:cardElevation="7dp">
 
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -32,6 +31,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="10dp"
+                android:contentDescription="@string/restaurant_image_content_description"
                 android:src="@mipmap/ic_launcher" />
 
             <TextView

@@ -4,10 +4,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.transition.Transition;
-import android.transition.TransitionSet;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,11 +27,12 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.transition.AutoTransition;
 import androidx.transition.ChangeBounds;
 import androidx.transition.TransitionManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class RestaurantsListActivity extends AppCompatActivity {
 
@@ -50,10 +52,14 @@ public class RestaurantsListActivity extends AppCompatActivity {
 
     //UIのView
     private EditText edtTxtRestaurantName, edtTxtLatitude, edtTxtLongitude;
-    private TextView txtPageNumber, txtFromDistanceContinuationText;
-    private Spinner spnLocation, spnDistance;
+    private TextView txtPageNumber, txtFromDistanceContinuationText, txtNameDisablingBudget;
+    private Spinner spnLocation, spnDistance, spnGenre, spnBudget;
     private Location locationCurrentSearch;                //検索の際に使う位置情報。
     private static final int EARTH_RADIUS = 6371;          //検索位置からお店までの距離のために使う。Kmです。
+
+    //検索条件を保存して、「この条件で検索」ボタンを押すまでずっと同じ条件で検索し続けます。ここからはその検索条件のフィールドです。
+    private int querySpnLocationIndex, querySpnDistanceIndex, querySpnGenreIndex, querySpnBudgetIndex;
+    private String queryLatitudeValue, queryLongitudeValue, queryRestaurantNameValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,26 +75,7 @@ public class RestaurantsListActivity extends AppCompatActivity {
         apiKey = this.getResources().getString(R.string.gourmet_api_key);
 
         //UI変数の代入
-        maxPageNumber = 1;  //データがもらったら上書きされます。データがない時に１にすると「次のページへ」ボタンが表示されないので１にします。
-        currentlyLoading = false;
-        searchParamsExpanded = false;
-        locationCurrentSearch = null;   //APIのURLを設定する際に求めます。現在地で検索しないと代入されません。
-        recView = findViewById(R.id.recView);
-        btnSearch = findViewById(R.id.btnSearch);
-        btnOpenMaps = findViewById(R.id.btnOpenMaps);
-        spnLocation = findViewById(R.id.spnLocation);
-        spnDistance = findViewById(R.id.spnDistance);
-        btnToNextPage = findViewById(R.id.btnNextPage);
-        txtPageNumber = findViewById(R.id.txtPageNumber);
-        edtTxtLatitude = findViewById(R.id.edtTxtLatitude);
-        edtTxtLongitude = findViewById(R.id.edtTxtLongitude);
-        btnToPreviousPage = findViewById(R.id.btnPreviousPage);
-        edtTxtRestaurantName = findViewById(R.id.edtTxtRestaurantName);
-        relLayoutCoordinates = findViewById(R.id.relLayoutCoordinates);
-        relLayoutObfuscationPanel = findViewById(R.id.relLayoutObfuscationPanel);
-        relLayoutExpandedSearchParams = findViewById(R.id.relLayoutExpandedSearchParams);
-        relLayoutCollapsedSearchParams = findViewById(R.id.relLayoutCollapsedSearchParams);
-        txtFromDistanceContinuationText = findViewById(R.id.txtFromDistanceContinuationText);
+        initializeUIComponents();
 
         //MainActivityと同じようにSpinnerにEvent Listenerを追加します。
         spnLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -104,13 +91,32 @@ public class RestaurantsListActivity extends AppCompatActivity {
             }
         });
 
+        //MainActivityと同じようにedtTxtRestaurantTextにTextChangedListenerを追加します。
+        //店舗名で検索すると予算が無視されるからです。
+        edtTxtRestaurantName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                handleRestaurantNameTextChanged(charSequence);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+
         //前のページからデータを取得します。
         Intent intent = getIntent();
         edtTxtRestaurantName.setText(intent.getStringExtra("restaurantName"));
-        spnLocation.setSelection(intent.getIntExtra("spnLocationIndex", 1));    //EventListenerですぐに設定されません。この後直接呼びます。
+        spnLocation.setSelection(intent.getIntExtra("spnLocationIndex", 0));    //EventListenerですぐに設定されません。この後直接呼びます。
         edtTxtLatitude.setText(intent.getStringExtra("latitude"));      //空文字が送信される場合もあります。
         edtTxtLongitude.setText(intent.getStringExtra("longitude"));    //空文字が送信される場合もあります。
-        spnDistance.setSelection(intent.getIntExtra("spnDistanceIndex", 1));
+        spnDistance.setSelection(intent.getIntExtra("spnDistanceIndex", 0));
+        spnGenre.setSelection(intent.getIntExtra("spnGenreIndex", 0));
+        spnBudget.setSelection(intent.getIntExtra("spnBudgetIndex", 0));
 
         //検索処理の準備と実行を行います。
         //画面内のボタンでも呼べるようにしたいのでViewのパラメータが必要となります。
@@ -118,22 +124,65 @@ public class RestaurantsListActivity extends AppCompatActivity {
 
     }
 
+    private void initializeUIComponents() {
+        maxPageNumber = 1;  //データがもらったら上書きされます。データがない時に１にすると「次のページへ」ボタンが表示されないので１にします。
+        currentlyLoading = false;
+        searchParamsExpanded = false;
+        locationCurrentSearch = null;   //APIのURLを設定する際に求めます。現在地で検索しないと代入されません。
+        recView = findViewById(R.id.recView);
+        btnSearch = findViewById(R.id.btnSearch);
+        btnOpenMaps = findViewById(R.id.btnOpenMaps);
+        spnLocation = findViewById(R.id.spnLocation);
+        spnDistance = findViewById(R.id.spnDistance);
+        spnGenre = findViewById(R.id.spnGenre);
+        spnBudget = findViewById(R.id.spnBudget);
+        btnToNextPage = findViewById(R.id.btnNextPage);
+        txtPageNumber = findViewById(R.id.txtPageNumber);
+        edtTxtLatitude = findViewById(R.id.edtTxtLatitude);
+        edtTxtLongitude = findViewById(R.id.edtTxtLongitude);
+        btnToPreviousPage = findViewById(R.id.btnPreviousPage);
+        edtTxtRestaurantName = findViewById(R.id.edtTxtRestaurantName);
+        relLayoutCoordinates = findViewById(R.id.relLayoutCoordinates);
+        txtNameDisablingBudget = findViewById(R.id.txtNameDisablingBudget);
+        relLayoutObfuscationPanel = findViewById(R.id.relLayoutObfuscationPanel);
+        relLayoutExpandedSearchParams = findViewById(R.id.relLayoutExpandedSearchParams);
+        relLayoutCollapsedSearchParams = findViewById(R.id.relLayoutCollapsedSearchParams);
+        txtFromDistanceContinuationText = findViewById(R.id.txtFromDistanceContinuationText);
+    }
+
     public void initiateSearch(View view) {
 
         startLoadingAnimation();
 
         //新しい検索の場合はページが１にします。別のページへ移動するというのは「同じクエリですがスタートがずれます」という意味になります。
+        //保存せずに検索条件に書き込んだら、次のページへ移動する際に実際にクエリに使う値に戻します。
         if(view.getId() == R.id.btnPreviousPage){
+
             currentResultsPage--;
+            resetFieldsToSavedParameters();
+
         } else if(view.getId() == R.id.btnNextPage) {
+
             currentResultsPage++;
-        } else {
+            resetFieldsToSavedParameters();
+
+        } else {    //検索ボタン（MainActivityか本画面のbtnSearch）で行われた検索。この場合は、新しいクエリなので検索条件をフィールドに保存します。
+
             currentResultsPage = 1;
+            //ディフォルトの位置が選ばれた場合は設定します。
+            if(spnLocation.getSelectedItemPosition() != 0 || spnLocation.getSelectedItemPosition() != 1){
+                setExistingCoordinatesForQuery();
+            }
+            saveCurrentSearchParameters();
+
+            //全入力項目を.trim()してから入力チェックを行います。新しいクエリの時にしかチェックする必要がありません。
+            trimAllTextInputs();
+            if(!checkInputsValidity()){
+                terminateLoadingAnimation();
+                return;
+            }
+
         }
-
-        //TODO: input check once more. the user should be checked equally as thoroughly every time they search, and from any page
-
-        //TODO: have within the input check a method call that trims every text field
 
         //URLの設定を行います
         String url = setUrlForSearch();
@@ -152,6 +201,42 @@ public class RestaurantsListActivity extends AppCompatActivity {
         //実行を開始します
         getData(url);
 
+    }
+
+    private void setExistingCoordinatesForQuery() {
+        String chosenCity = spnLocation.getSelectedItem().toString();
+
+        //勝手に選んで手で入力した場所の座標を取得して、チェックを行って、座標を設定します。。
+        RecordedCoordinates recordedCoordinates = new RecordedCoordinates(this);
+        ArrayList<HashMap<String,String>> recordedCoordinatesList = recordedCoordinates.getRecordedCoordinatesList();
+        for (HashMap<String, String> map :
+                recordedCoordinatesList) {
+            if (map.get("name").equals(chosenCity)) {
+                edtTxtLatitude.setText(map.get("coordinates").split(",")[0]);
+                edtTxtLongitude.setText(map.get("coordinates").split(",")[1]);
+                return;
+            }
+        }
+    }
+
+    private void resetFieldsToSavedParameters(){
+        spnLocation.setSelection(querySpnLocationIndex);
+        spnDistance.setSelection(querySpnDistanceIndex);
+        spnGenre.setSelection(querySpnGenreIndex);
+        spnBudget.setSelection(querySpnBudgetIndex);
+        edtTxtLatitude.setText(queryLatitudeValue);
+        edtTxtLongitude.setText(queryLongitudeValue);
+        edtTxtRestaurantName.setText(queryRestaurantNameValue);
+    }
+
+    private void saveCurrentSearchParameters() {
+        querySpnLocationIndex = spnLocation.getSelectedItemPosition();
+        querySpnDistanceIndex = spnDistance.getSelectedItemPosition();
+        querySpnGenreIndex = spnGenre.getSelectedItemPosition();
+        querySpnBudgetIndex = spnBudget.getSelectedItemPosition();
+        queryLatitudeValue = edtTxtLatitude.getText().toString();
+        queryLongitudeValue = edtTxtLongitude.getText().toString();
+        queryRestaurantNameValue = edtTxtRestaurantName.getText().toString();
     }
 
     private void handlePageMovementButtonsVisibility() {
@@ -182,8 +267,10 @@ public class RestaurantsListActivity extends AppCompatActivity {
         btnOpenMaps.setEnabled(false);
         btnToPreviousPage.setEnabled(false);
         btnToNextPage.setEnabled(false);
-        //txtViewにも入力できないようにします。
+        //EditTextも入力できないようにします。
         edtTxtRestaurantName.setEnabled(false);
+        edtTxtLatitude.setEnabled(false);
+        edtTxtLongitude.setEnabled(false);
     }
 
     private void terminateLoadingAnimation() {
@@ -196,6 +283,8 @@ public class RestaurantsListActivity extends AppCompatActivity {
         btnToNextPage.setEnabled(true);
         //txtViewにまた入力できなるようにします。
         edtTxtRestaurantName.setEnabled(true);
+        edtTxtLatitude.setEnabled(true);
+        edtTxtLongitude.setEnabled(true);
     }
 
     private void setCurrentPageNumberText(){
@@ -325,11 +414,20 @@ public class RestaurantsListActivity extends AppCompatActivity {
         url.append("&lng=" + locationCurrentSearch.getLongitude());
 
         //検索範囲の設定。APIの順番で保存していますのでindexがあれば一致します。ただ、API側で1から始まるので値+1します。 参考：https://webservice.recruit.co.jp/doc/hotpepper/reference.html 、「range」に注目
-        url.append("&range=" + (spnDistance.getSelectedItemPosition() + 1));
+        url.append("&range=" + (querySpnDistanceIndex + 1));
 
         //追加の任意項目があればここで設定します。
-        if(!edtTxtRestaurantName.getText().toString().isEmpty()){
-            url.append("&name_any=" + edtTxtRestaurantName.getText().toString().trim());
+        //店舗名
+        if(!queryRestaurantNameValue.isEmpty()){
+            url.append("&name_any=" + queryRestaurantNameValue.trim());
+        }
+        //ジャンル
+        if(querySpnGenreIndex!= 0){    // 0 = 未選択
+            url.append("&genre=" + getGenreCode());
+        }
+        //予算
+        if(querySpnBudgetIndex != 0){
+            url.append("&budget=" + getBudgetCode());
         }
 
         url.append("&start=" + (MAX_RESULTS_PER_PAGE * (currentResultsPage - 1) + 1));
@@ -340,6 +438,7 @@ public class RestaurantsListActivity extends AppCompatActivity {
 
         return url.toString();
     }
+
 
     private Location getSearchLocation() {
 
@@ -360,7 +459,10 @@ public class RestaurantsListActivity extends AppCompatActivity {
             Toast.makeText(this, "位置情報がありません。Google Maps等を一旦開いてから戻ってください。", Toast.LENGTH_LONG).show();
 
             //携帯にGoogle Mapsアプリケーションがあれば私が開きます。
-            MapsOpener.openMapsApp(this, 35.71014978852772, 139.81068430321494); //東京スカイツリーです。
+            //最初に検索を開始した時、画面がまだ作成中で、UI Threadが忙しいです。onCreate()の中から他のActivityを呼ぶことができないのでMapsを待たせます。Handlerに遅れを任せます。
+            new Handler(Looper.getMainLooper()).post(() ->{
+                MapsOpener.openMapsApp(this, 35.71014978852772, 139.81068430321494,"Tokyo Skytree"); //東京スカイツリーです。
+            });
 
         }
 
@@ -384,10 +486,10 @@ public class RestaurantsListActivity extends AppCompatActivity {
 
          */
 
-        //ユーザーが「地域を指定」を選んで、座標を入力した場合
-        if(spnLocation.getSelectedItemPosition() == 1 && location != null){
-            location.setLatitude(Double.parseDouble(edtTxtLatitude.getText().toString()));
-            location.setLongitude(Double.parseDouble((edtTxtLongitude.getText().toString())));
+        //「現在地」を選択した場合以外の座標設定
+        if(querySpnLocationIndex != 0 && location != null){
+            location.setLatitude(Double.parseDouble(queryLatitudeValue));
+            location.setLongitude(Double.parseDouble(queryLongitudeValue));
         }
 
         //最悪の場合はnullを返します。
@@ -438,6 +540,93 @@ public class RestaurantsListActivity extends AppCompatActivity {
             //「から」メッセージを上に戻します。
             txtFromDistanceContinuationText.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void handleRestaurantNameTextChanged(CharSequence charSequence) {
+        if(!charSequence.toString().isEmpty()){
+            spnBudget.setEnabled(false);
+            //未選択に戻します。そうすると直接urlに書きません。
+            spnBudget.setSelection(0);
+            txtNameDisablingBudget.setVisibility(View.VISIBLE);
+        } else {
+            spnBudget.setEnabled(true);
+            txtNameDisablingBudget.setVisibility(View.GONE);
+        }
+    }
+
+    private String getGenreCode() {
+        //本場であればgenreマスタAPIを使って取得して自分のRecyclerViewAdapterに保存するのですがShopと全く同じことになるので今回はやらないと判断させていただきます。
+        String[] genreCodes = {"未選択","G001","G002","G003","G004","G005","G006","G007","G008","G017","G009","G010","G011","G012","G013","G016","G014","G015"};
+        //+1する必要がありません。
+        return genreCodes[spnGenre.getSelectedItemPosition()];
+    }
+
+    private String getBudgetCode() {
+        String[] budgetCodes = {"未選択","B009","B010","B011","B001","B002","B003","B008","B004","B005","B006","B012","B013","B014"};
+        //+1する必要がありません。
+        return budgetCodes[spnBudget.getSelectedItemPosition()];
+    }
+
+    private boolean checkInputsValidity() {
+
+        //「座標を指定」を選択した場合の座標入力チェック
+        if(spnLocation.getSelectedItemPosition() == 1){
+
+            String latitudeText = edtTxtLatitude.getText().toString();
+            TextView txtLatitudeError = findViewById(R.id.txtLatitudeError);
+            List<Character> allowedCoordinatesCharacters = List.of('0','1','2','3','4','5','6','7','8','9','.');
+
+            //緯度　未入力チェック
+            if(latitudeText.isEmpty()){
+                txtLatitudeError.setText(getString(R.string.text_missing_alert));
+                txtLatitudeError.setVisibility(View.VISIBLE);
+                return false;
+            }
+
+            //緯度　値チェック
+            for (int i = 0; i < latitudeText.length(); i++) {
+                if(!allowedCoordinatesCharacters.contains(latitudeText.charAt(i))){
+                    txtLatitudeError.setText(getString(R.string.text_incorrect_character_alert, latitudeText.charAt(i)));
+                    txtLatitudeError.setVisibility(View.VISIBLE);
+                    return false;
+                }
+            }
+
+            //全ての緯度チェックが大丈夫だったらエラーメッセージを非表示
+            txtLatitudeError.setVisibility(View.GONE);
+
+            String longitudeText = edtTxtLongitude.getText().toString();
+            TextView txtLongitudeError = findViewById(R.id.txtLongitudeError);
+
+            //経度　未入力チェック
+            if(longitudeText.isEmpty()){
+                txtLongitudeError.setText(getString(R.string.text_missing_alert));
+                txtLongitudeError.setVisibility(View.VISIBLE);
+                return false;
+            }
+
+            //経度　値チェック
+            for (int i = 0; i < longitudeText.length(); i++) {
+                if(!allowedCoordinatesCharacters.contains(longitudeText.charAt(i))){
+                    txtLongitudeError.setText(getString(R.string.text_incorrect_character_alert, longitudeText.charAt(i)));
+                    txtLongitudeError.setVisibility(View.VISIBLE);
+                    return false;
+                }
+            }
+
+            //全ての経度チェックが大丈夫だったらエラーメッセージを非表示
+            txtLongitudeError.setVisibility(View.GONE);
+
+        }
+
+        return true;
+
+    }
+
+    private void trimAllTextInputs() {
+        edtTxtLatitude.setText(edtTxtLatitude.getText().toString().trim());
+        edtTxtLongitude.setText(edtTxtLongitude.getText().toString().trim());
+        edtTxtRestaurantName.setText(edtTxtRestaurantName.getText().toString().trim());
     }
 
     public void openMapsApp(View view){

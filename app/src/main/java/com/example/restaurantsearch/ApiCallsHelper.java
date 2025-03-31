@@ -100,7 +100,8 @@ public class ApiCallsHelper {
 
     public Shop convertToShop(JSONObject jsonShop){
         //JSONにデータがなければそのまま空でいいと思います。
-        String id, name, genre, address, stationName, latitude, longitude, openingHours, estimatedPrice, access, imageUrl, websiteUrl;
+        String id, name, genre, address, stationName, latitude, longitude, openingHours, estimatedPrice, access, imageUrl, websiteUrl,
+                hasParking, cardAvailability, smokingSeats, isBarrierFree, hasLunch, hasTatami, acceptsPets, hasKaraoke;
 
         try{
             id = jsonShop.has("id") ? jsonShop.getString("id") : "";
@@ -145,11 +146,21 @@ public class ApiCallsHelper {
                     websiteUrl = jsonShop.getJSONObject("urls").getString("pc");
                 }
             }
+
+            hasParking = jsonShop.has("parking") ? jsonShop.getString("parking") : "";
+            cardAvailability = jsonShop.has("card") ? jsonShop.getString("card") : "";
+            smokingSeats = jsonShop.has("non_smoking") ? jsonShop.getString("non_smoking") : "";
+            isBarrierFree = jsonShop.has("barrier_free") ? jsonShop.getString("barrier_free") : "";
+            hasLunch = jsonShop.has("lunch") ? jsonShop.getString("lunch") : "";
+            hasTatami = jsonShop.has("tatami") ? jsonShop.getString("tatami") : "";
+            acceptsPets = jsonShop.has("pet") ? jsonShop.getString("pet") : "";
+            hasKaraoke = jsonShop.has("karaoke") ? jsonShop.getString("karaoke") : "";
+
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
 
-        return new Shop(id,name,genre,address,stationName,latitude,longitude,openingHours,estimatedPrice,access,imageUrl,websiteUrl);
+        return new Shop(id, name, genre, address, stationName, latitude, longitude, openingHours, estimatedPrice, access, imageUrl, websiteUrl, hasParking, cardAvailability, smokingSeats, isBarrierFree, hasLunch, hasTatami, acceptsPets, hasKaraoke);
     }
 
 }

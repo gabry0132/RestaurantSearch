@@ -51,12 +51,15 @@
 
         </RelativeLayout>
 
+        <!-- focusableとclickableをtrueにしないと後ろの物をクリックできちゃいます -->
         <RelativeLayout
             android:id="@+id/relLayoutExpandedSearchParams"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
             android:layout_marginTop="60dp"
+            android:clickable="true"
+            android:focusable="true"
             android:visibility="gone">
 
             <ImageView
@@ -117,24 +120,44 @@
 
                     <EditText
                         android:id="@+id/edtTxtLatitude"
-                        android:layout_width="200dp"
+                        android:layout_width="270dp"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/txtCoordinatesHelper"
-                        android:layout_marginStart="20dp"
+                        android:layout_marginStart="10dp"
                         android:hint="@string/latitude"
                         tools:layout_editor_absoluteX="51dp"
                         tools:layout_editor_absoluteY="266dp" />
 
+                    <TextView
+                        android:id="@+id/txtLatitudeError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@+id/edtTxtLatitude"
+                        android:layout_alignEnd="@+id/edtTxtLatitude"
+                        android:layout_marginTop="13dp"
+                        android:textColor="@color/red"
+                        android:visibility="gone" />
+
                     <EditText
                         android:id="@+id/edtTxtLongitude"
-                        android:layout_width="200dp"
+                        android:layout_width="270dp"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/edtTxtLatitude"
-                        android:layout_marginStart="20dp"
+                        android:layout_marginStart="10dp"
                         android:layout_marginTop="5dp"
                         android:hint="@string/longitude"
                         tools:layout_editor_absoluteX="55dp"
                         tools:layout_editor_absoluteY="328dp" />
+
+                    <TextView
+                        android:id="@+id/txtLongitudeError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@+id/edtTxtLongitude"
+                        android:layout_alignEnd="@+id/edtTxtLongitude"
+                        android:layout_marginTop="13dp"
+                        android:textColor="@color/red"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/txtCoordinatesContinuationText"
@@ -189,35 +212,99 @@
                     android:text="@string/within"
                     android:textSize="16sp" />
 
+                <TextView
+                    android:id="@+id/txtShopNameIntro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/spnDistance"
+                    android:text="@string/additional_parameters_intro"
+                    android:textSize="18sp" />
 
                 <EditText
                     android:id="@+id/edtTxtRestaurantName"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
-                    android:layout_below="@+id/spnDistance"
-                    android:layout_margin="10dp"
+                    android:layout_below="@+id/txtShopNameIntro"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"
                     android:ems="10"
                     android:hint="@string/store_name_hint"
                     android:importantForAutofill="no"
                     android:inputType="text" />
+
+                <TextView
+                    android:id="@+id/txtNameDisablingBudget"
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/edtTxtRestaurantName"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@id/edtTxtRestaurantName"
+                    android:text="@string/name_disables_budget_warning" />
+
+                <RelativeLayout
+                    android:id="@+id/relLayoutGenreHolder"
+                    android:layout_width="335dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edtTxtRestaurantName"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:id="@+id/txtShopGenreIntro"
+                        android:layout_width="135dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/shop_genre_intro"
+                        android:textSize="16sp" />
+
+                    <Spinner
+                        android:id="@+id/spnGenre"
+                        android:layout_width="200dp"
+                        android:layout_height="50dp"
+                        android:layout_toEndOf="@+id/txtShopGenreIntro"
+                        android:entries="@array/genres" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/relLayoutBudgetHolder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/relLayoutGenreHolder"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:id="@+id/txtBudgetIntro"
+                        android:layout_width="135dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/budget_intro"
+                        android:textSize="16sp" />
+
+                    <Spinner
+                        android:id="@+id/spnBudget"
+                        android:layout_width="200dp"
+                        android:layout_height="50dp"
+                        android:layout_toEndOf="@+id/txtBudgetIntro"
+                        android:entries="@array/budgets" />
+
+                </RelativeLayout>
 
                 <!-- layout_belowのポインターは必ず最後のedtTxtにしてください。 -->
                 <Button
                     android:id="@+id/btnSearch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/edtTxtRestaurantName"
-                    android:layout_marginStart="160dp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_below="@id/relLayoutBudgetHolder"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginBottom="15dp"
                     android:onClick="initiateSearch"
                     android:text="@string/store_search_new_params" />
 
-
             </RelativeLayout>
 
-
         </RelativeLayout>
-
 
     </RelativeLayout>
 

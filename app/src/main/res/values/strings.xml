@@ -30,10 +30,54 @@
     <string name="longitude">経度</string>
     <string name="google_maps">Google Maps等を利用して検索位置となる緯度と経度を取得してください。</string>
     <string name="open_maps">地図を見る</string>
+    <string name="shop_genre_intro">お店のジャンル</string>
+    <string name="budget_intro">予算</string>
+    <string name="name_disables_budget_warning">店舗名で検索すると予算が選択できなくなります。</string>
+    <string name="text_missing_alert">未入力</string>
+    <string name="text_incorrect_character_alert">不正文字「%c」</string>
+    <string name="restaurant_image_content_description">レストランの代表的な画像</string>
+    <string name="opening_hours_intro">Opening Hours</string>
+    <string name="txt_access_intro">アクセス：</string>
+    <string name="txt_address_intro">住所：</string>
+    <string name="address">Address</string>
+    <string name="btnText_check_on_map">地図で確認する</string>
+    <string name="tel_number_intro">TEL：</string>
+    <string name="telephone_number">Telephone Number</string>
+    <string name="card_availability">Card Availability</string>
+    <string name="card_availability_intro">カード可：</string>
+    <string name="smoking_seats_availability">Smoking Seats Availability</string>
+    <string name="smoking_seats_availability_intro">禁煙席：</string>
+    <string name="has_parking">Has Parking</string>
+    <string name="is_barrier_free">Is Barrier Free</string>
+    <string name="is_barrier_free_intro">バリアフリー：</string>
+    <string name="has_karaoke">Has Karaoke</string>
+    <string name="has_karaoke_intro">カラオケあり：</string>
+    <string name="has_lunch">Has Lunch</string>
+    <string name="has_lunch_intro">ランチあり：</string>
+    <string name="accepts_pets">Accepts Pets</string>
+    <string name="accepts_pets_intro">ペット可：</string>
+    <string name="has_tatami">Has Tatami</string>
+    <string name="has_tatami_intro">座敷あり：</string>
+    <string name="go_to_website">予約はウェブサイトへ</string>
+    <string name="has_parking_intro">駐車場あり：</string>
+    <string name="tokyo_station_coordinates">35.68128252135296,139.76721701269693</string>
+    <string name="ueno_station_coordinates">35.714217256672775,139.77715723321836</string>
+    <string name="shibuya_crossing_coordinates">35.65948626913256,139.7004698070433</string>
+    <string name="shinjuku_station_coordinates">35.6896053622599,139.7006846649175</string>
+    <string name="nagoya_station_coordinates">35.1706401320887,136.8818560866267</string>
+    <string name="osaka_station_coordinates">34.70242993653327,135.49593676393403</string>
+    <string name="namba_station_coordinates">34.66707581835745,135.50037530406024</string>
     <!-- GPSスタートラインスピナーのアイテム -->
     <string-array name="locations_selector">
         <item>現在地</item>
-        <item>地域を指定</item>
+        <item>座標を指定</item>
+        <item>東京駅</item>
+        <item>上野駅</item>
+        <item>渋谷交差点</item>
+        <item>新宿駅</item>
+        <item>名古屋駅</item>
+        <item>大阪駅（梅田）</item>
+        <item>難波駅</item>
     </string-array>
     <!-- 距離スピナーのアイテム -->
     <string-array name="distance_selector">
@@ -42,5 +86,42 @@
         <item>1000</item>
         <item>2000</item>
         <item>3000</item>
+    </string-array>
+    <!-- 店のジャンル -->
+    <string-array name="genres">
+        <item>未選択</item>
+        <item>居酒屋</item>
+        <item>ダイニングバー・バル</item>
+        <item>創作料理</item>
+        <item>和食</item>
+        <item>イタリアン・フレンチ</item>
+        <item>中華</item>
+        <item>焼肉・ホルモン</item>
+        <item>韓国料理</item>
+        <item>アジア・エスニック料理</item>
+        <item>各国料理</item>
+        <item>カラオケ・パーティ</item>
+        <item>バー・カクテル</item>
+        <item>ラーメン</item>
+        <item>お好み焼き・もんじゃ</item>
+        <item>カフェ・スイーツ</item>
+        <item>その他グルメ</item>
+    </string-array>
+    <!-- 予算 -->
+    <string-array name="budgets">
+        <item>未選択</item>
+        <item>～500円</item>
+        <item>501～1000円</item>
+        <item>1001～1500円</item>
+        <item>1501～2000円</item>
+        <item>2001～3000円</item>
+        <item>3001～4000円</item>
+        <item>4001～5000円</item>
+        <item>5001～7000円</item>
+        <item>7001～10000円</item>
+        <item>10001～15000円</item>
+        <item>15001～20000円</item>
+        <item>20001～30000円</item>
+        <item>30001円～</item>
     </string-array>
 </resources>

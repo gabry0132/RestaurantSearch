@@ -1,15 +1,16 @@
 package com.example.restaurantsearch;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -53,8 +54,13 @@ public class ShopsRecyclerViewAdapter extends RecyclerView.Adapter<ShopsRecycler
                 //ロード中だったら何もさせません
                 if(RestaurantsListActivity.currentlyLoading) return;
 
-                //onClick()の中でpositionがアクセスできないのでgetAdapterPosition()でindexを求めます。
-                Toast.makeText(context, "selected " + shops.get(holder.getAdapterPosition()).getName(), Toast.LENGTH_SHORT).show();
+                //普通は一覧からIDを取得して、詳細画面に入ったらそのIDを使って詳細データを取得するんですが、今回は一覧の結果にはお店の全てのデータが入っていますので2回APIを呼ぶより対象のオブジェクトを次の画面に渡したほうが速いです。
+                //オブジェクトを次のアクティビティに渡すために、Shopクラスは implements Serializableにしました。そうすると自動的にデータがバイトの形で送信できるようになります。
+                //Serializableと同じ機能のParcelableクラスもありそうですがスピードよりShopクラスの分かりやすさの方が優先したかったので@OverrideメソッドがないSerializableにしました。
+                Intent intent = new Intent(context, RestaurantDetailsActivity.class);
+                //onClick()の中でpositionがアクセスできないのでgetAdapterPosition()でindexを求めて、レストラン詳細ページへ移動させます。
+                intent.putExtra("shop", shops.get(holder.getAdapterPosition()));
+                ContextCompat.startActivity(context, intent,null);
             }
         });
 

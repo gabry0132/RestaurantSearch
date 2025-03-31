@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/beige"
+    tools:context=".RestaurantDetailsActivity">
+
+    <TextView
+        android:id="@+id/txtShopName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="5dp"
+        android:text="@string/shop_name"
+        android:textSize="26sp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:layout_below="@+id/txtShopName"
+        android:id="@+id/scrollViewEverythingWrapper">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/relLayoutEverythingWrapper" >
+
+        <RelativeLayout
+            android:id="@+id/relLayoutImageAndDataPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@string/restaurant_image_content_description"
+                android:src="@mipmap/ic_launcher" />
+
+            <TextView
+                android:id="@+id/txtOpeningHours"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/image"
+                android:layout_marginBottom="20dp"
+                android:layout_toEndOf="@+id/image"
+                android:text="@string/opening_hours_intro"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/txtGenre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtOpeningHours"
+                android:layout_marginBottom="20dp"
+                android:layout_toEndOf="@+id/image"
+                android:text="@string/shop_genre"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/txtEstimatedPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtGenre"
+                android:layout_marginBottom="20dp"
+                android:layout_toEndOf="@+id/image"
+                android:text="@string/estimated_price"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relLayoutLocationInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/relLayoutImageAndDataPanel"
+            android:paddingEnd="10dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/relLayoutAddressHolder"
+                android:layout_marginBottom="10dp"
+
+                >
+
+                <TextView
+                    android:id="@+id/txtAddressIntro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:textSize="16sp"
+                    android:text="@string/txt_address_intro" />
+
+                <TextView
+                    android:id="@+id/txtAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@+id/txtAddressIntro"
+                    android:text="@string/address" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/relLayoutAccessHolder"
+                android:layout_below="@+id/relLayoutAddressHolder" >
+
+                <TextView
+                    android:id="@+id/txtAccessIntro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="19dp"
+                    android:textSize="16sp"
+                    android:text="@string/txt_access_intro" />
+
+                <TextView
+                    android:id="@+id/txtAccess"
+                    android:layout_width="270dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/txtAccessIntro"
+                    android:layout_marginStart="10dp"
+                    android:textSize="16sp"
+                    android:layout_toEndOf="@+id/txtAccessIntro"
+                    android:text="@string/access" />
+
+            </RelativeLayout>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relLayoutAccessHolder"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:onClick="openMapsApp"
+                android:text="@string/btnText_check_on_map" />
+
+        </RelativeLayout>
+
+        <!-- テーブルにボーダーが欲しいので -->
+        <RelativeLayout
+            android:id="@+id/relLayoutTableWrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/relLayoutLocationInfo"
+            android:background="@color/sky_blue"
+            android:padding="1dp">
+
+            <TableLayout
+                android:id="@+id/tblMiscInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- APIに電話番号が入っていますが結果に出てきません。取得する方法があればこの下を追加してください。 -->
+    <!--            <TableRow-->
+    <!--                android:id="@+id/tblRowTelNumber"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="match_parent"-->
+    <!--                android:background="@color/light_sky_blue"-->
+    <!--                android:padding="5dp">-->
+
+    <!--                <TextView-->
+    <!--                    android:layout_width="wrap_content"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:id="@+id/txtTelNumberIntro"-->
+    <!--                    android:layout_marginStart="20dp"-->
+    <!--                    android:text="@string/tel_number_intro"-->
+    <!--                    android:textSize="16sp" />-->
+
+    <!--                <TextView-->
+    <!--                    android:id="@+id/txtTelNumber"-->
+    <!--                    android:layout_marginStart="50dp"-->
+    <!--                    android:text="@string/telephone_number"-->
+    <!--                    android:textSize="16sp" />-->
+
+    <!--            </TableRow>-->
+
+                <TableRow
+                    android:id="@+id/tblRowHasParking"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/light_azure"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtHasParkingIntro"
+                        android:layout_marginStart="20dp"
+                        android:text="@string/has_parking_intro"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="210dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:id="@+id/txtHasParking"
+                        android:layout_marginStart="30dp"
+                        android:text="@string/has_parking"
+                        android:textSize="16sp" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tblRowCreditCardAvailability"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/light_sky_blue"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtCardAvailabilityIntro"
+                        android:layout_marginStart="20dp"
+                        android:text="@string/card_availability_intro"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="210dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:id="@+id/txtCardAvailability"
+                        android:layout_marginStart="30dp"
+                        android:text="@string/card_availability"
+                        android:textSize="16sp" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tblRowSmokingSeats"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/light_azure"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtSmokingSeatsIntro"
+                        android:layout_marginStart="20dp"
+                        android:text="@string/smoking_seats_availability_intro"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="210dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:id="@+id/txtSmokingSeats"
+                        android:layout_marginStart="30dp"
+                        android:text="@string/smoking_seats_availability"
+                        android:textSize="16sp" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tblRowIsBarrierFree"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/light_sky_blue"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtIsBarrierFreeIntro"
+                        android:layout_marginStart="20dp"
+                        android:text="@string/is_barrier_free_intro"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="210dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:id="@+id/txtIsBarrierFree"
+                        android:layout_marginStart="30dp"
+                        android:text="@string/is_barrier_free"
+                        android:textSize="16sp" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tblRowHasLunch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/light_azure"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtHasLunchIntro"
+                        android:layout_marginStart="20dp"
+                        android:text="@string/has_lunch_intro"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="210dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:id="@+id/txtHasLunch"
+                        android:layout_marginStart="30dp"
+                        android:text="@string/has_lunch"
+                        android:textSize="16sp" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tblRowHasTatami"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/light_sky_blue"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtHasTatamiIntro"
+                        android:layout_marginStart="20dp"
+                        android:text="@string/has_tatami_intro"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="210dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:id="@+id/txtHasTatami"
+                        android:layout_marginStart="30dp"
+                        android:text="@string/has_tatami"
+                        android:textSize="16sp" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tblRowAcceptsPets"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/light_azure"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtAcceptsPetsIntro"
+                        android:layout_marginStart="20dp"
+                        android:text="@string/accepts_pets_intro"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="210dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:id="@+id/txtAcceptsPets"
+                        android:layout_marginStart="30dp"
+                        android:text="@string/accepts_pets"
+                        android:textSize="16sp" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tblRowHasKaraoke"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/light_sky_blue"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtHasKaraokeIntro"
+                        android:layout_marginStart="20dp"
+                        android:text="@string/has_karaoke_intro"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="210dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:id="@+id/txtHasKaraoke"
+                        android:layout_marginStart="30dp"
+                        android:text="@string/has_karaoke"
+                        android:textSize="16sp" />
+
+                </TableRow>
+
+            </TableLayout>
+
+        </RelativeLayout>
+
+            <Button
+                android:id="@+id/btnOpenWebsite"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relLayoutTableWrapper"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="30dp"
+                android:onClick="openWebPage"
+                android:padding="15dp"
+                android:textSize="16sp"
+                android:text="@string/go_to_website" />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

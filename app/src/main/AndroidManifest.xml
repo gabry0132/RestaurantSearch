@@ -2,13 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <!-- ネットと繋げるため -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!-- 携帯のGPSを使うため。アンドロイド12以上なら両方が必要です -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 携帯のGPSを使うため。アンドロイド12以上なら両方が必要です -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
-        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -17,11 +15,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.RestaurantSearch"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".RestaurantDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".RestaurantsListActivity"
-            android:parentActivityName=".MainActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

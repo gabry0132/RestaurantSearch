@@ -4,7 +4,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="beige">#faf0e6</color>
     <color name="light_azure">#E4BFE2</color>
-    <color name="light_sky_blue">#98D9F5</color>
+    <color name="light_sky_blue">#C2DDED</color>
     <color name="sky_blue">#98AAF5</color>
+    <color name="red">#FF0000</color>
 
 </resources>
