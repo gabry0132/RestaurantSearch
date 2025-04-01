@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 }
@@ -5,6 +7,10 @@ plugins {
 android {
     namespace = "com.example.restaurantsearch"
     compileSdk = 35
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.example.restaurantsearch"
@@ -14,15 +20,32 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    //APIキーをできるだけ隠すために秘密のlocal.propertiesファイルに入れました。
+    //コードを実行しようと思ったら、RestaurantsListActivity.javaの apyKey =
+    val localProperties = Properties()
+    val localPropertiesFile = File(rootDir, "local.properties")
+    if(localPropertiesFile.exists() && localPropertiesFile.isFile){
+        localPropertiesFile.inputStream().use {
+            localProperties.load(it)
+        }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            //リバース・エンジニアリングしても分かりづらいものに切り替えます
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String","API_KEY",localProperties.getProperty("API_KEY"))
+            signingConfig = signingConfigs.getByName("debug")
+        }
+        debug {
+            buildConfigField("String","API_KEY",localProperties.getProperty("API_KEY"))
         }
     }
     compileOptions {

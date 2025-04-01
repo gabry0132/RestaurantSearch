@@ -1,5 +1,4 @@
 <resources>
-    <string name="gourmet_api_key">9907554b6fcbbf43</string>    <!-- 本番であれば企業のやり方で隠します -->
     <string name="app_name">Restaurant Search</string>
     <string name="main_title">レストラン検索</string>
     <string name="credits_bottom_page">Powered by <u>ホットペッパーグルメ Webサービス</u></string> <!-- リンクであることをユーザにアンダーバーで示します -->

@@ -7,5 +7,10 @@
     <color name="light_sky_blue">#C2DDED</color>
     <color name="sky_blue">#98AAF5</color>
     <color name="red">#FF0000</color>
+    <color name="dark_background">#181D26</color>
+    <color name="pink_primary">#fc0fc0</color>
+    <color name="pink_primary_variant">#a90078</color>
+    <color name="pink_secondary">#006b5c</color>
+    <color name="pink_secondary_variant">#65baa9</color>
 
 </resources>

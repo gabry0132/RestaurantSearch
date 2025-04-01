@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -25,13 +26,15 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText edtTxtRestaurantName, edtTxtLatitude, edtTxtLongitude;
     private Spinner spnLocation, spnDistance, spnGenre, spnBudget;
-    private TextView txtSpinnerContinuationText, txtNameDisablingBudget;
+    private TextView txtSpinnerContinuationText, txtNameDisablingBudget, txtLatitudeError, txtLongitudeError;
     private RelativeLayout relLayoutCoordinates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        //ライトモードのみに設定します。
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -84,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
         //代わりに地図を開いて、自分で取ってもらいます。わざわざ座標を探しに行く人がいないと思うんですが、この状況から元々作りたかった地図バージョンへの移動が簡単なので将来のために機能をカットしないことにしました。
         edtTxtLatitude = findViewById(R.id.edtTxtLatitude);
         edtTxtLongitude = findViewById(R.id.edtTxtLongitude);
+        txtLatitudeError = findViewById(R.id.txtLatitudeError);
+        txtLongitudeError = findViewById(R.id.txtLongitudeError);
         relLayoutCoordinates = findViewById(R.id.relLayoutCoordinates);
         edtTxtRestaurantName = findViewById(R.id.edtTxtRestaurantName);
         txtSpinnerContinuationText = findViewById(R.id.txtSpinnerContinuationText);
@@ -115,6 +120,10 @@ public class MainActivity extends AppCompatActivity {
             txtSpinnerContinuationText.setVisibility(View.GONE);
 
         } else {
+
+            //入力エラーメッセージが出てきた場合は、今度また表示しないようにここで隠します。
+            txtLatitudeError.setVisibility(View.GONE);
+            txtLongitudeError.setVisibility(View.GONE);
 
             //座標入力パネルを非表示
             relLayoutCoordinates.setVisibility(View.GONE);
@@ -150,8 +159,15 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, RestaurantsListActivity.class);
         intent.putExtra("spnLocationIndex", spnLocationIndex);
-        intent.putExtra("latitude", edtTxtLatitude.getText().toString());
-        intent.putExtra("longitude", edtTxtLongitude.getText().toString());
+        //座標を指定する場合だけに送信します。なぜかというと、座標を入力しても別のモードで送信するなら入力した値を無視してほしいからです。
+        //画面内なら再確認はさせますが、送信するときに選択されたのが最優先です。
+        if(spnLocationIndex == 1){
+            intent.putExtra("latitude", edtTxtLatitude.getText().toString());
+            intent.putExtra("longitude", edtTxtLongitude.getText().toString());
+        } else {    //座標を指定以外
+            intent.putExtra("latitude", "");
+            intent.putExtra("longitude", "");
+        }
         intent.putExtra("spnDistanceIndex", spnDistanceIndex);
         intent.putExtra("restaurantName", restaurantName);
         intent.putExtra("spnGenreIndex", spnGenreIndex);
@@ -167,7 +183,6 @@ public class MainActivity extends AppCompatActivity {
         if(spnLocation.getSelectedItemPosition() == 1){
 
             String latitudeText = edtTxtLatitude.getText().toString();
-            TextView txtLatitudeError = findViewById(R.id.txtLatitudeError);
             List<Character> allowedCoordinatesCharacters = List.of('0','1','2','3','4','5','6','7','8','9','.');
 
             //緯度　未入力チェック
@@ -190,7 +205,6 @@ public class MainActivity extends AppCompatActivity {
             txtLatitudeError.setVisibility(View.GONE);
 
             String longitudeText = edtTxtLongitude.getText().toString();
-            TextView txtLongitudeError = findViewById(R.id.txtLongitudeError);
 
             //経度　未入力チェック
             if(longitudeText.isEmpty()){
